@@ -1,0 +1,28 @@
+name: Jira Details
+
+on:
+    pull_request:
+        types:
+            [review_requested, review_request_removed, opened, reopened]
+
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+
+jobs:
+    jira-ticket-info:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Extract branch name
+              shell: bash
+              run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+              id: extract_branch
+            - name: Extract branch name
+              shell: bash
+              run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+            - name: Echo issues
+              run: echo "The selected issue is ${{ steps.jira-ticket-info.outputs.issue }}"
+            #setup Jira command Line Util
+            - name: Setup Jira CLI
+              uses: atlassian/gajira-cli@master
+            - name: Make comment on Jira issue
+              run: jira --issue=${{ steps.jira-ticket-info.outputs.issue }} --comment=\"Actions in action\""
