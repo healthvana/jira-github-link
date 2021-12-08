@@ -10,7 +10,7 @@ on:
 
 jobs:
     jira-ticket-info:
-        runs-on: macOS-latest
+        runs-on: macos-latest
         steps:
             - uses: actions/checkout@v2
             - name: Install deps
