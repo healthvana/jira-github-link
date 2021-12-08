@@ -3,11 +3,7 @@ import fetch from 'node-fetch';
 // const require = createRequire(import.meta.url);
 
 // Anything
-const {
-  JIRA_API_TOKEN,
-  JIRA_USER_EMAIL,
-  JIRA_BASE_URL
-} = process.env;
+const { JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
 
 const getIssueKeyfromBranch = async branch => {
   const projects = await getProjects();
@@ -44,6 +40,7 @@ const getIssue = async issue => {
 const getIssueInfoFromBranchName = async branch => {
   const key = await getIssueKeyfromBranch(branch);
   const issueData = await getIssue(key);
+  console.log(issueData);
   return issueData;
 };
 
