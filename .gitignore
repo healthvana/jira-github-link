@@ -1,1 +1,4 @@
-devconfig.js
+devconfig.*
+node_modules/
+.DS_STORE
+usersMap.json

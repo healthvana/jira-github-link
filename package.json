@@ -1,15 +1,26 @@
 {
-  "name": "jira-github-link",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "author": "",
-  "license": "ISC",
   "dependencies": {
-    "node-fetch": "^3.1.0"
+    "@actions/core": "^1.6.0",
+    "@actions/github": "^5.0.0",
+    "@slack/webhook": "^6.0.0",
+    "@types/lodash": "^4.14.178",
+    "@types/node": "^16.11.13",
+    "@typescript-eslint/eslint-plugin": "^5.7.0",
+    "@typescript-eslint/parser": "^5.7.0",
+    "jira.js": "^2.8.0",
+    "lodash": "^4.17.21",
+    "octokit": "^1.7.1",
+    "ts-node": "^10.4.0",
+    "tslib": "^2.3.1",
+    "typescript": "^4.5.4"
   },
-  "type": "module"
+  "description": "",
+  "license": "ISC",
+  "main": "index.js",
+  "name": "jira-github-link",
+  "scripts": {
+    "exec": "node --loader ts-node/esm ./src/index.ts"
+  },
+  "version": "1.0.0"
 }
