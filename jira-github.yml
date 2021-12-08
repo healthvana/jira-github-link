@@ -12,6 +12,7 @@ jobs:
     jira-ticket-info:
         runs-on: macOS-latest
         steps:
+            - uses: actions/checkout@v2
             - name: Install deps
               shell: bash
               run: npm i
