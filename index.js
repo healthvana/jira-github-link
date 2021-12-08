@@ -1,8 +1,9 @@
 import fetch from 'node-fetch';
-// import { createRequire } from "module";
-// const require = createRequire(import.meta.url);
+import core from '@actions/core';
+import github from '@actions/github';
 
-// Anything
+const context = github.context;
+
 const { JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
 
 const getIssueKeyfromBranch = async branch => {
@@ -40,7 +41,8 @@ const getIssue = async issue => {
 const getIssueInfoFromBranchName = async branch => {
   const key = await getIssueKeyfromBranch(branch);
   const issueData = await getIssue(key);
-  console.log(issueData);
+  core.setOutput('issueData', issueData);
+  console.log(context);
   return issueData;
 };
 
