@@ -1,6 +1,12 @@
 import fetch from 'node-fetch';
-
-
+import { createRequire } from "module";
+const require = createRequire(import.meta.url);
+const {
+  JIRA_API_TOKEN,
+  JIRA_USER_EMAIL,
+  JIRA_BASE_URL,
+  GITHUB_BRANCH,
+} = require('./devconfig.json');
 
 const getIssueKeyfromBranch = async branch => {
   const projects = await getProjects();
@@ -37,7 +43,7 @@ const getIssue = async issue => {
 const getIssueInfoFromBranchName = async branch => {
   const key = await getIssueKeyfromBranch(GITHUB_BRANCH);
   const issueData = await getIssue(key);
-  console.log(issueData)
-}
+  console.log(issueData);
+};
 
 getIssueInfoFromBranchName();
