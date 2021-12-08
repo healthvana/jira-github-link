@@ -4,8 +4,7 @@ const require = createRequire(import.meta.url);
 const {
   JIRA_API_TOKEN,
   JIRA_USER_EMAIL,
-  JIRA_BASE_URL,
-  GITHUB_BRANCH,
+  JIRA_BASE_URL
 } = require('./devconfig.json');
 
 const getIssueKeyfromBranch = async branch => {
@@ -41,9 +40,9 @@ const getIssue = async issue => {
 };
 
 const getIssueInfoFromBranchName = async branch => {
-  const key = await getIssueKeyfromBranch(GITHUB_BRANCH);
+  const key = await getIssueKeyfromBranch(branch);
   const issueData = await getIssue(key);
-  console.log(issueData);
+  return issueData;
 };
 
-getIssueInfoFromBranchName();
+getIssueInfoFromBranchName(process.argv[2]);

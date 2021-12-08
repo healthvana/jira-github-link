@@ -16,13 +16,8 @@ jobs:
               shell: bash
               run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
               id: extract_branch
-            - name: Extract branch name
-              shell: bash
-              run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+            - name: Get Issues from Jira
+              run: node index.js ${{steps.extract_branch.outputs.branch}}
+              id: get_issues
             - name: Echo issues
-              run: echo "The selected issue is ${{ steps.jira-ticket-info.outputs.issue }}"
-            #setup Jira command Line Util
-            - name: Setup Jira CLI
-              uses: atlassian/gajira-cli@master
-            - name: Make comment on Jira issue
-              run: jira --issue=${{ steps.jira-ticket-info.outputs.issue }} --comment=\"Actions in action\""
+              run: echo "The selected issue data is ${{ steps.jira-ticket-info.outputs.issue }}"
