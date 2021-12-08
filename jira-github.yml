@@ -12,6 +12,9 @@ jobs:
     jira-ticket-info:
         runs-on: macOS-latest
         steps:
+            - name: Install deps
+              shell: bash
+              run: npm i
             - name: Extract branch name
               shell: bash
               run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
