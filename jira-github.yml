@@ -10,14 +10,18 @@ on:
 
 jobs:
     jira-ticket-info:
-        runs-on: ubuntu-latest
+        runs-on: macOS-latest
         steps:
             - name: Extract branch name
               shell: bash
               run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
               id: extract_branch
             - name: Get Issues from Jira
+              env:
+                JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
+                JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
+                JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
               run: node index.js ${{steps.extract_branch.outputs.branch}}
               id: get_issues
             - name: Echo issues
-              run: echo "The selected issue data is ${{ steps.jira-ticket-info.outputs.issue }}"
+              run: echo "The selected issue data is ${{ steps.get_issues.outputs.issue }}"

@@ -1,11 +1,12 @@
 import fetch from 'node-fetch';
-import { createRequire } from "module";
-const require = createRequire(import.meta.url);
+// import { createRequire } from "module";
+// const require = createRequire(import.meta.url);
+
 const {
   JIRA_API_TOKEN,
   JIRA_USER_EMAIL,
   JIRA_BASE_URL
-} = require('./devconfig.json');
+} = process.env;
 
 const getIssueKeyfromBranch = async branch => {
   const projects = await getProjects();
