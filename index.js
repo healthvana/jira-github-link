@@ -6,7 +6,8 @@ const context = github.context;
 
 const { JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
 
-const getIssueKeyfromBranch = async branch => {
+const getIssueKeyfromBranch = async () => {
+  console.log(context);
   const projects = await getProjects();
   const projectsRegex = `((${projects.join('|')})-\\d{1,})`;
   const matches = branch.match(new RegExp(projectsRegex));
@@ -46,4 +47,4 @@ const getIssueInfoFromBranchName = async branch => {
   return issueData;
 };
 
-getIssueInfoFromBranchName(process.argv[2]);
+getIssueInfoFromBranchName();
