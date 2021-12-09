@@ -2,16 +2,17 @@ import fetch from 'node-fetch';
 import core from '@actions/core';
 import github from '@actions/github';
 
-
 const context = github.context;
 
 const { JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
 
 const getIssueKeyfromBranch = async () => {
   //branch
-  const { pull_request } = context;
+  const {
+    payload: { pull_request },
+  } = context;
 
-  console.log(context);
+  console.log(pull_request);
 
   // const {
   //   title,
