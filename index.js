@@ -18,13 +18,15 @@ const getIssueKeyfromBranch = async () => {
   const projects = await getProjects();
   //Look for possible keys using this regex
   const projectsRegex = `((${projects.join('|')})-\\d{1,})`;
-  const matches = branch.match(new RegExp(projectsRegex));
+  const branchMatches = branch.match(new RegExp(projectsRegex));
   const titleMatches = title.match(new RegExp(projectsRegex));
-  if (!matches?.length && !titleMatches?.length) {
+  if (!branchMatches?.length && !titleMatches?.length) {
     return new Error(`No issue keys found in branch name "${branch}"`);
   }
+  const issues = [];
   // evaluate both and return best
-  return matches[0];
+
+  return branchMatches[0];
 };
 
 const jiraFetch = async url => {
