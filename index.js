@@ -30,11 +30,11 @@ const context = github.context;
 // const { JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
 //
 
-// UTIL - Authed Jira fetch function
+// UTILS - Authed Jira fetch functions
 /**
  *
- * @param {string} url
- * @returns {object}
+ * @param {string} url Stub of the rest API url, ex: '/rest/api/2/project/search'
+ * @returns {object} JSON response
  */
 const jiraFetch = async url => {
   const encodedString = Buffer.from(
@@ -94,6 +94,7 @@ const getIssueKeysfromBranch = async () => {
   const titleMatches = title.match(regexp);
   // If none, throw; maybe later comment on the PR?
   if (!branchMatches?.length && !titleMatches?.length) {
+    
     return new Error(`No issue keys found in branch name "${branch}"`);
   }
   return [...new Set(branchMatches.concat(titleMatches))];
