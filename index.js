@@ -7,14 +7,20 @@ const context = github.context;
 const { JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
 
 const getIssueKeyfromBranch = async () => {
-  console.log(context);
+  //branch
+  const {
+    title,
+    base: { ref: branch },
+  } = context;
   const projects = await getProjects();
   const projectsRegex = `((${projects.join('|')})-\\d{1,})`;
-  // const matches = branch.match(new RegExp(projectsRegex));
-  // if (!matches.length) {
-  //   return new Error(`No issue keys found in branch name "${branch}"`);
-  // }
-  // return matches[0];
+  // TO DO: also check title
+  const matches = branch.match(new RegExp(projectsRegex));
+  const titleMatches = title.match(new RegExp(projectsRegex));
+  if (!matches.length) {
+    return new Error(`No issue keys found in branch name "${branch}"`);
+  }
+  return matches[0];
 };
 
 const jiraFetch = async url => {
