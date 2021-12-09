@@ -39,12 +39,12 @@ const getIssue = async issue => {
   return await jiraFetch(`rest/api/2/issue/${issue}?expand=names`);
 };
 
-const getIssueInfoFromBranchName = async branch => {
-  const key = await getIssueKeyfromBranch(branch);
-  const issueData = await getIssue(key);
-  core.setOutput('issueData', issueData);
-  console.log(context);
-  return issueData;
-};
+// const getIssueInfoFromBranchName = async () => {
+//   const key = await getIssueKeyfromBranch();
+//   const issueData = await getIssue(key);
+//   core.setOutput('issueData', issueData);
+//   console.log(context);
+//   return issueData;
+// };
 
-getIssueInfoFromBranchName();
+getIssueKeyfromBranch();
