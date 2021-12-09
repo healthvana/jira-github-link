@@ -11,7 +11,7 @@ const getIssueKeyfromBranch = async () => {
   //branch
   const { pull_request } = context;
 
-  console.log(pull_request);
+  console.log(context);
 
   // const {
   //   title,
