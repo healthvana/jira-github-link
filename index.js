@@ -9,17 +9,21 @@ const { JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
 const getIssueKeyfromBranch = async () => {
   //branch
   const {
-    title,
-    base: { ref: branch },
+    pull_request: {
+      title,
+      head: { ref: branch },
+    },
   } = context;
+  // Get every possible project key from Jira
   const projects = await getProjects();
+  //Look for possible keys using this regex
   const projectsRegex = `((${projects.join('|')})-\\d{1,})`;
-  // TO DO: also check title
   const matches = branch.match(new RegExp(projectsRegex));
   const titleMatches = title.match(new RegExp(projectsRegex));
-  if (!matches.length) {
+  if (!matches?.length && !titleMatches?.length) {
     return new Error(`No issue keys found in branch name "${branch}"`);
   }
+  // evaluate both and return best
   return matches[0];
 };
 
