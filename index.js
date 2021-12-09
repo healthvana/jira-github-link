@@ -10,11 +10,11 @@ const getIssueKeyfromBranch = async () => {
   console.log(context);
   const projects = await getProjects();
   const projectsRegex = `((${projects.join('|')})-\\d{1,})`;
-  const matches = branch.match(new RegExp(projectsRegex));
-  if (!matches.length) {
-    return new Error(`No issue keys found in branch name "${branch}"`);
-  }
-  return matches[0];
+  // const matches = branch.match(new RegExp(projectsRegex));
+  // if (!matches.length) {
+  //   return new Error(`No issue keys found in branch name "${branch}"`);
+  // }
+  // return matches[0];
 };
 
 const jiraFetch = async url => {
