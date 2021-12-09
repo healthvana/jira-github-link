@@ -1,33 +1,33 @@
 import fetch from 'node-fetch';
 import core from '@actions/core';
-// import github from '@actions/github';
+import github from '@actions/github';
 
 // ----FOR LOCAL DEV
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
-const {
-  JIRA_API_TOKEN,
-  JIRA_USER_EMAIL,
-  JIRA_BASE_URL,
-} = require('./devconfig.json');
-const github = {
-  context: {
-    payload: {
-      pull_request: {
-        title: 'PLAN-5, HV-2897 - something',
-        head: {
-          ref: 'i/PLAN-5/akjshdkjh',
-        },
-      },
-    },
-  },
-};
+// import { createRequire } from 'module';
+// const require = createRequire(import.meta.url);
+// const {
+//   JIRA_API_TOKEN,
+//   JIRA_USER_EMAIL,
+//   JIRA_BASE_URL,
+// } = require('./devconfig.json');
+// const github = {
+//   context: {
+//     payload: {
+//       pull_request: {
+//         title: 'PLAN-5, HV-2897 - something',
+//         head: {
+//           ref: 'i/PLAN-5/akjshdkjh',
+//         },
+//       },
+//     },
+//   },
+// };
 //
 
 const context = github.context;
 
 // --- FOR PROD
-// const { JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
+const { JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
 //
 
 // UTILS - Authed Jira fetch functions
@@ -118,7 +118,7 @@ const getIssueInfoFromBranchName = async () => {
     })
   );
 
-  // core.setOutput('issuesData', issuesData);
+  core.setOutput('issuesData', issuesData);
   console.log(issuesData);
   return issuesData;
 };
