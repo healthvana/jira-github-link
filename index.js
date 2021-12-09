@@ -18,7 +18,7 @@ const getIssueKeyfromBranch = async () => {
   const projects = await getProjects();
   //Look for possible keys using this regex
   const projectsRegex = `((${projects.join('|')})-\\d{1,})`;
-  const branchMatches = branch.match(new RegExp(projectsRegex));
+  const branchMatches = branch.match(new RegExp(projectsRegex), "gi");
   const titleMatches = title.match(new RegExp(projectsRegex));
   if (!branchMatches?.length && !titleMatches?.length) {
     return new Error(`No issue keys found in branch name "${branch}"`);
