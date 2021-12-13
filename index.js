@@ -1,4 +1,4 @@
-import fetch from 'node-fetch';
+import JiraJS from 'jira.js';
 import core from '@actions/core';
 import github from '@actions/github';
 
@@ -10,6 +10,7 @@ import github from '@actions/github';
 //   JIRA_USER_EMAIL,
 //   JIRA_BASE_URL,
 // } = require('./devconfig.json');
+
 // const github = {
 //   context: {
 //     payload: {
@@ -19,60 +20,35 @@ import github from '@actions/github';
 //           ref: 'i/PLAN-5/akjshdkjh',
 //         },
 //       },
+//       repo: {
+//         name: 'h',
+//         owner: 'healthvana',
+//       },
 //     },
 //   },
 // };
-//
-
-const context = github.context;
-
 // --- FOR PROD
 const { JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
-//
-
-// UTILS - Authed Jira fetch functions
-/**
- *
- * @param {string} url Stub of the rest API url, ex: '/rest/api/2/project/search'
- * @returns {object} JSON response
- */
-const jiraFetch = async url => {
-  const encodedString = Buffer.from(
-    `${JIRA_USER_EMAIL}:${JIRA_API_TOKEN}`
-  ).toString('base64');
-
-  const response = await fetch(`${JIRA_BASE_URL}${url}`, {
-    headers: {
-      Authorization: `Basic ${encodedString}`,
+const { Version2Client } = JiraJS;
+const jira = new Version2Client({
+  host: JIRA_BASE_URL,
+  authentication: {
+    basic: {
+      email: JIRA_USER_EMAIL,
+      apiToken: JIRA_API_TOKEN,
     },
-  });
-  return await response.json();
-};
+  },
+  telemetry: false,
+});
 
-/**
- * Gets all existing projects from Jira
- * @returns {array}
- */
-const getProjects = async () => {
-  const projects = await jiraFetch('/rest/api/2/project/search');
-  return projects.values.map(project => project.key);
-};
-
-/**
- * Gets information on a specific JIRA issue
- * @param {string} issue Jira issue key
- * @returns {object} issue information
- */
-const getIssue = async issue => {
-  return await jiraFetch(`rest/api/2/issue/${issue}?expand=names`);
-};
+const context = github.context;
 
 // ----------WORKFLOW
 /**
  * Uses the context from a github action to take
  * the title and branch name in question and pull out
  * all Jira Project keys.
- * @returns {array} Array of issue keys
+ * @returns {array} Array of unique issue keys
  */
 const getIssueKeysfromBranch = async () => {
   // Get PR info from Github Action context
@@ -82,19 +58,32 @@ const getIssueKeysfromBranch = async () => {
         title,
         head: { ref: branch },
       },
+      number: issue_number,
+      repo: {
+        name: repo,
+        owner: {
+          owner, //TO DO:
+        },
+      },
     },
   } = context;
-
   // Get every possible project key from Jira
-  const projects = await getProjects();
+  const projectsInfo = await jira.projects.getAllProjects();
+  const projects = projectsInfo.map(prj => prj.key);
+  console.log('projects::', projects);
   // Look for possible keys using this regex
   const projectsRegex = `((${projects.join('|')})-\\d{1,})`;
   const regexp = new RegExp(projectsRegex, 'gi');
   const branchMatches = branch.match(regexp);
   const titleMatches = title.match(regexp);
-  // If none, throw; maybe later comment on the PR?
+  // If none, throw; label PR
   if (!branchMatches?.length && !titleMatches?.length) {
-    
+    //     github.issues.addLabels({
+    //       owner,
+    // repo,
+    // issue_number,
+    // [{ name: "NO JIRA TICKET"}]
+    //     })
     return new Error(`No issue keys found in branch name "${branch}"`);
   }
   return [...new Set(branchMatches.concat(titleMatches))];
@@ -107,7 +96,7 @@ const getIssueInfoFromBranchName = async () => {
     keys.map(async key => {
       let data = null;
       try {
-        data = await getIssue(key);
+        data = await jira.issues.getIssue({ issueIdOrKey: key });
       } catch (e) {
         console.error(
           `Issue ${key} could not be found in Jira or could not be fetched:`
