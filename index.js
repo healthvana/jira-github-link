@@ -59,18 +59,18 @@ const getIssueKeysfromBranch = async () => {
         head: { ref: branch },
       },
       number: issue_number,
-      repo: {
-        name: repo,
-        owner: {
-          owner, //TO DO:
-        },
-      },
+      // repo: {
+      //   name: repo,
+      //   owner: {
+      //     owner, //TO DO:
+      //   },
+      // },
     },
   } = context;
+  console.log('payload::', payload);
   // Get every possible project key from Jira
   const projectsInfo = await jira.projects.getAllProjects();
   const projects = projectsInfo.map(prj => prj.key);
-  console.log('projects::', projects);
   // Look for possible keys using this regex
   const projectsRegex = `((${projects.join('|')})-\\d{1,})`;
   const regexp = new RegExp(projectsRegex, 'gi');
