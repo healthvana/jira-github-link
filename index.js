@@ -52,21 +52,20 @@ const context = github.context;
  */
 const getIssueKeysfromBranch = async () => {
   // Get PR info from Github Action context
+  const { payload } = context;
   const {
-    payload: {
-      pull_request: {
-        title,
-        head: { ref: branch },
-      },
-      number: issue_number,
-      // repo: {
-      //   name: repo,
-      //   owner: {
-      //     owner, //TO DO:
-      //   },
-      // },
+    pull_request: {
+      title,
+      head: { ref: branch },
     },
-  } = context;
+    number: issue_number,
+    // repo: {
+    //   name: repo,
+    //   owner: {
+    //     owner, //TO DO:
+    //   },
+    // },
+  } = payload;
   console.log('payload::', payload);
   // Get every possible project key from Jira
   const projectsInfo = await jira.projects.getAllProjects();
