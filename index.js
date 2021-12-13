@@ -59,12 +59,11 @@ const getIssueKeysfromBranch = async () => {
       head: { ref: branch },
     },
     number: issue_number,
-    // repo: {
-    //   name: repo,
-    //   owner: {
-    //     owner, //TO DO:
-    //   },
-    // },
+    repository: {
+      name: repo,
+      owner: { login: owner },
+    },
+    requested_reviewers
   } = payload;
   console.log('payload::', payload);
   // Get every possible project key from Jira
@@ -90,7 +89,6 @@ const getIssueKeysfromBranch = async () => {
 
 const getIssueInfoFromBranchName = async () => {
   const keys = await getIssueKeysfromBranch();
-  console.log('keys::', keys);
   const issuesData = await Promise.all(
     keys.map(async key => {
       let data = null;
@@ -110,5 +108,10 @@ const getIssueInfoFromBranchName = async () => {
   console.log(issuesData);
   return issuesData;
 };
+
+// const setCodeReviewer = async () => {
+//   const issuesInfo = await getIssueInfoFromBranchName();
+
+// };
 
 getIssueInfoFromBranchName();
