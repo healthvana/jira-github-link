@@ -1,34 +1,43 @@
 import JiraJS from 'jira.js';
 import core from '@actions/core';
 import github from '@actions/github';
+import { IncomingWebhook } from '@slack/webhook';
 
 // ----FOR LOCAL DEV
-// import { createRequire } from 'module';
-// const require = createRequire(import.meta.url);
-// const {
-//   JIRA_API_TOKEN,
-//   JIRA_USER_EMAIL,
-//   JIRA_BASE_URL,
-// } = require('./devconfig.json');
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+const {
+  JIRA_API_TOKEN,
+  JIRA_USER_EMAIL,
+  JIRA_BASE_URL,
+} = require('./devconfig.json');
+const users = require('./usermap.json');
 
-// const github = {
-//   context: {
-//     payload: {
-//       pull_request: {
-//         title: 'PLAN-5, HV-2897 - something',
-//         head: {
-//           ref: 'i/PLAN-5/akjshdkjh',
-//         },
-//       },
-//       repo: {
-//         name: 'h',
-//         owner: 'healthvana',
-//       },
-//     },
-//   },
-// };
+const github = {
+  context: {
+    payload: {
+      pull_request: {
+        title: 'PLAN-5, HV-2897 - something',
+        head: {
+          ref: 'i/PLAN-5/akjshdkjh',
+        },
+      },
+      repository: {
+        name: 'h',
+        owner: 'healthvana',
+      },
+      requested_reviewers: [
+        {
+          login: 'michaelkunc',
+        },
+      ],
+    },
+  },
+};
 // --- FOR PROD
-const { JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
+// const { SLACK_WEBHOOK_URL, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
+
+// Setup Jira client
 const { Version2Client } = JiraJS;
 const jira = new Version2Client({
   host: JIRA_BASE_URL,
@@ -42,6 +51,9 @@ const jira = new Version2Client({
 });
 
 const context = github.context;
+
+//Setup Slack Client
+const webhook = new IncomingWebhook(SLACK_WEBHOOK_URL);
 
 // ----------WORKFLOW
 /**
@@ -81,25 +93,29 @@ const getIssueKeysfromBranch = async () => {
         owner,
         repo,
         issue_number,
-        label: [{ name: 'NO JIRA TICKET' }]
+        label: [{ name: 'NO JIRA TICKET' }],
       });
     } catch (e) {
       return new Error(
         `No issue keys found in branch name "${branch} and unable to label PR."`
       );
     }
-    return new Error(`No issue keys found in branch name "${branch}"; PR label added.`);
+    return new Error(
+      `No issue keys found in branch name "${branch}"; PR label added.`
+    );
   }
   return [...new Set(branchMatches.concat(titleMatches))];
 };
 
-const getIssueInfoFromBranchName = async () => {
-  const keys = await getIssueKeysfromBranch();
+/*
+
+*/
+const getIssueInfoFromBranchName = async keys => {
   const issuesData = await Promise.all(
     keys.map(async key => {
       let data = null;
       try {
-        data = await jira.issues.getIssue({ issueIdOrKey: key });
+        data = await jira.issues.getIssue({ issueIdOrKey: key, expand: "names" });
       } catch (e) {
         console.error(
           `Issue ${key} could not be found in Jira or could not be fetched:`
@@ -115,9 +131,32 @@ const getIssueInfoFromBranchName = async () => {
   return issuesData;
 };
 
-// const setCodeReviewer = async () => {
-//   const issuesInfo = await getIssueInfoFromBranchName();
+const setCodeReviewer = async issueInfo => {
+  const { key } = issueInfo;
+  jira.issues.editIssue({
+    issueIdOrKey: key,
+    fields: {},
+  });
+};
 
-// };
 
-getIssueInfoFromBranchName();
+
+const onPRCreateOrReview = async () => {
+  const keys = await getIssueKeysfromBranch();
+  let issuesInfo = [];
+  try {
+    issuesInfo = await getIssueInfoFromBranchName(keys);
+  } catch (e) {
+    return new Error('Unable to return issue info');
+  }
+  const { expand: { names: customFields }} = issuesInfo[0];
+  //Prepare custom field referance table.
+  let customFieldMap = {};
+  Object.keys(customFields).forEach(jiraName => {
+    customFieldMap[customFields[jiraName]] = jiraName;
+  });
+  await Promise.all(issuesInfo.forEach(issue => setCodeReviewer()));
+  // await webhook.send({
+  //   text: "test",
+  // });
+};
