@@ -1,6 +1,6 @@
 import JiraJS from 'jira.js';
 import core from '@actions/core';
-import github from '@actions/github';
+// import github from '@actions/github';
 import { IncomingWebhook } from '@slack/webhook';
 
 // ----FOR LOCAL DEV
@@ -10,6 +10,7 @@ const {
   JIRA_API_TOKEN,
   JIRA_USER_EMAIL,
   JIRA_BASE_URL,
+  SLACK_WEBHOOK_URL,
 } = require('./devconfig.json');
 const users = require('./usermap.json');
 
@@ -17,9 +18,9 @@ const github = {
   context: {
     payload: {
       pull_request: {
-        title: 'PLAN-5, HV-2897 - something',
+        title: 'HV2-3261 - something',
         head: {
-          ref: 'i/PLAN-5/akjshdkjh',
+          ref: 'i/HV2-3261/akjshdkjh',
         },
       },
       repository: {
@@ -75,9 +76,8 @@ const getIssueKeysfromBranch = async () => {
       name: repo,
       owner: { login: owner },
     },
-    requested_reviewers,
   } = payload;
-  console.log('payload::', payload);
+  // console.log('payload::', payload);
   // Get every possible project key from Jira
   const projectsInfo = await jira.projects.getAllProjects();
   const projects = projectsInfo.map(prj => prj.key);
@@ -115,7 +115,10 @@ const getIssueInfoFromBranchName = async keys => {
     keys.map(async key => {
       let data = null;
       try {
-        data = await jira.issues.getIssue({ issueIdOrKey: key, expand: "names" });
+        data = await jira.issues.getIssue({
+          issueIdOrKey: key,
+          expand: 'names',
+        });
       } catch (e) {
         console.error(
           `Issue ${key} could not be found in Jira or could not be fetched:`
@@ -126,20 +129,34 @@ const getIssueInfoFromBranchName = async keys => {
     })
   );
 
-  core.setOutput('issuesData', issuesData);
-  console.log(issuesData);
+  // core.setOutput('issuesData', issuesData);
   return issuesData;
 };
 
-const setCodeReviewer = async issueInfo => {
-  const { key } = issueInfo;
-  jira.issues.editIssue({
-    issueIdOrKey: key,
-    fields: {},
+const formatCustomFields = issueInfo => {
+  //Prepare custom field referance table.
+  const { names: customFields } = issueInfo;
+  let customFieldMap = {};
+  Object.keys(customFields).forEach(jiraName => {
+    customFieldMap[customFields[jiraName]] = jiraName;
   });
+  return customFieldMap;
 };
 
+/**
+ *
+ * @param {Object} issueInfo
+ */
+const getReviewersInfo = () => {
+  const {
+    payload: { requested_reviewers },
+  } = context;
 
+  // find the user in the map
+  return requested_reviewers.map(({ login }) => {
+    return users.find(user => user.github === login);
+  });
+};
 
 const onPRCreateOrReview = async () => {
   const keys = await getIssueKeysfromBranch();
@@ -149,14 +166,41 @@ const onPRCreateOrReview = async () => {
   } catch (e) {
     return new Error('Unable to return issue info');
   }
-  const { expand: { names: customFields }} = issuesInfo[0];
-  //Prepare custom field referance table.
-  let customFieldMap = {};
-  Object.keys(customFields).forEach(jiraName => {
-    customFieldMap[customFields[jiraName]] = jiraName;
+  // Fields should be the same across the board
+  const customFieldsMap = formatCustomFields(issuesInfo[0]);
+  const reviewersInfo = getReviewersInfo();
+  const cfCodeReviewerField = customFieldsMap['Code Reviewer(s)'];
+
+  let response;
+  const reviewersInJira = reviewersInfo.map(r => {
+    console.log('reviewer in loop', r);
+    return { accountId: r.jiraAccountId };
   });
-  await Promise.all(issuesInfo.forEach(issue => setCodeReviewer()));
+  const requestBodyBase = {
+    fields: {
+      [cfCodeReviewerField]: reviewersInJira,
+      summary: 'This is from an automation again',
+    },
+  };
+  try {
+    response = await Promise.all(
+      issuesInfo.map(async issue => {
+        const finalRequestBody = {
+          issueIdOrKey: issue.key,
+          ...requestBodyBase,
+        };
+        console.log('finalRequestBody::', JSON.stringify(finalRequestBody));
+        return await jira.issues.editIssue(finalRequestBody);
+      })
+    );
+  } catch (e) {
+    console.log(e);
+  }
+
+  console.log('response::', response);
+
   // await webhook.send({
   //   text: "test",
   // });
 };
+onPRCreateOrReview();
