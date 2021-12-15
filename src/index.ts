@@ -170,27 +170,11 @@ const getIssueInfoFromKeys = async (keys: string[] | Error) => {
       return data;
     })
   );
-  return issuesData.map(formatCustomFields);
+  // TO DO: Fetch Epic issue info as well, and append to issue as `issue.epic`
+  const formattedissues = issuesData.map(formatCustomFields);
+  return formattedissues;
 };
 
-
-
-/*  const completeData = await Promise.all(
-    formattedIssueData.map(async issue => {
-      let epicData;
-      try {
-        epicData = await jira.issues.getIssue({
-          issueIdOrKey: issue.fields.epicLink,
-          expand: 'names'
-        });
-      } catch (e) {
-        `Issue ${issue.fields.epicLink} could not be found in Jira or could not be fetched:`
-        return new Error(e)
-      }
-      epicData = formatCustomFields(epicData);
-      issue.epic = epicData;
-    });
-  ); */
 
 
 /**
@@ -251,12 +235,12 @@ const onPRCreateOrReview = async () => {
           ...requestBodyBase
         };
         // assign to Code Reviewer in Jira
-        // return await jira.issues.editIssue(finalRequestBody);
+        return await jira.issues.editIssue(finalRequestBody);
       })
     );
     // Send only one notification to Slack with all issues
     const json = CodeReviewNotification(issues, context);
-    // await webhook.send(json);
+    await webhook.send(json);
   } catch (e) {
     console.log(e);
   }

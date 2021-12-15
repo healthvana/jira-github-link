@@ -128,7 +128,7 @@ const CodeReviewTemplate = (issues: Issue[], context: Context) => {
 
   const blocks = [...jiraHeader, ...flatten(issuesBlock), ...github];
 
-  console.log(JSON.stringify(blocks, null, 4));
+  // console.log(JSON.stringify(blocks, null, 4));
 
   return {
     blocks
