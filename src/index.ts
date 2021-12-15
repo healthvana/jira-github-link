@@ -1,54 +1,51 @@
-// import { createRequire } from 'module';
-// const require = createRequire(import.meta.url);
-
-import { camelCase } from 'lodash';
-import { Version2Client } from 'jira.js';
 import core from '@actions/core';
-// import github from '@actions/github';
+import github from '@actions/github';
 import { IncomingWebhook } from '@slack/webhook';
+import { Version2Client } from 'jira.js';
+import { camelCase } from 'lodash';
 
-import CodeReviewNotification from '../templates/CodeReviewNotification';
+import CodeReviewNotification from './templates/CodeReviewNotification';
+import users from '../usermap.json';
 
 // ----FOR LOCAL DEV
 
-import {
-  JIRA_API_TOKEN,
-  JIRA_USER_EMAIL,
-  JIRA_BASE_URL,
-  SLACK_WEBHOOK_URL_DEV
-} from '../devconfig.json';
-import users from '../usermap.json';
+// import {
+//   JIRA_API_TOKEN,
+//   JIRA_USER_EMAIL,
+//   JIRA_BASE_URL,
+//   SLACK_WEBHOOK_URL_DEV
+// } from '../devconfig.json';
+// const github = {
+//   issues: {
+//     addLabels: (config) => config
+//   },
+//   context: {
+//     payload: {
+//       pull_request: {
+//         url: 'https://github.com/healthvana/h/pull/6433',
+//         title: 'HV2-3261 - something',
+//         head: {
+//           ref: 'i/HV2-3261/akjshdkjh'
+//         }
+//       },
+//       number: 1,
+//       repository: {
+//         name: 'h',
+//         owner: { login: 'healthvana' }
+//       },
+//       requested_reviewers: [
+//         {
+//           login: 'michaelkunc'
+//         }
+//       ]
+//     }
+//   }
+// };
+
 
 const webhookURL = SLACK_WEBHOOK_URL_DEV;
-
-const github = {
-  issues: {
-    addLabels: (config) => config
-  },
-  context: {
-    payload: {
-      pull_request: {
-        url: 'https://github.com/healthvana/h/pull/6433',
-        title: 'HV2-3261 - something',
-        head: {
-          ref: 'i/HV2-3261/akjshdkjh'
-        }
-      },
-      number: 1,
-      repository: {
-        name: 'h',
-        owner: { login: 'healthvana' }
-      },
-      requested_reviewers: [
-        {
-          login: 'michaelkunc'
-        }
-      ]
-    }
-  }
-};
 // --- FOR PROD
-// const { SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
+const { SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
 
 // Setup Jira client
 const jira = new Version2Client({
@@ -88,7 +85,7 @@ const getIssueKeysfromBranch = async () => {
       owner: { login: owner }
     }
   } = payload;
-  // console.log('payload::', payload);
+  console.log('payload::', payload);
 
   // Get all existing project keys from Jira
   const projectsInfo = await jira.projects.getAllProjects();
