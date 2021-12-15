@@ -53,7 +53,7 @@ const CodeReviewTemplate = (issues: Issue[], context: Context) => {
           },
           {
             type: 'mrkdwn',
-            text: `*Description:* \n${escape(truncate(issue.fields.description, { length: 200 }))}`
+            text: `*Description:* \n\`\`\`\`${escape(truncate(issue.fields.description, { length: 200 }))}\`\`\`\``
           }
         ]
       },
@@ -88,7 +88,7 @@ const CodeReviewTemplate = (issues: Issue[], context: Context) => {
       type: 'section',
       text: {
         type: 'mrkdwn',
-        text: `Developer: ${issues[0].fields.developer.displayName}`,
+        text: `*Developer:* ${issues[0].fields.developer.displayName}`,
       },
     },
     {
