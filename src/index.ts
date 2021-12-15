@@ -1,5 +1,5 @@
 import core from '@actions/core';
-// import github from '@actions/github';
+import github from '@actions/github';
 import { IncomingWebhook } from '@slack/webhook';
 import { Version2Client } from 'jira.js';
 import { camelCase } from 'lodash';
