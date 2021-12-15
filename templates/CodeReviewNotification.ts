@@ -1,4 +1,22 @@
-const CodeReviewTemplate = (issue:object, context:object) => {
+interface Issue {
+  reviewersInSlack: string;
+  browseURL: string;
+  key: string;
+  epicURL: string;
+  epicLink: string;
+}
+
+interface Context {
+  payload: {
+    pull_request: {
+      url: string;
+    }
+  }
+}
+
+
+const CodeReviewTemplate = (issues: Issue[], context: Context) => {
+
   return {
     blocks: [
       {
@@ -13,7 +31,7 @@ const CodeReviewTemplate = (issue:object, context:object) => {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: reviewersInSlack,
+          text: issues[0].reviewersInSlack,
         },
       },
       {
@@ -28,14 +46,14 @@ const CodeReviewTemplate = (issue:object, context:object) => {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `*Issue:* <${issue.browseURL}|${issue.key}>`,
+          text: `*Issue(s):* ${issues.map(issue => `<${issue.browseURL}|${issue.key}>`)}`,
         },
       },
       {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `*Epic:* <${issue.epicURL}|${issue.epicLink}>`,
+          text: `*Epic(s):* ${issues.map(issue => `<${issue.epicURL}|${issue.epicLink}>`)}`,
         },
       },
       {
@@ -50,7 +68,7 @@ const CodeReviewTemplate = (issue:object, context:object) => {
         type: 'section',
         text: {
           type: 'mrkdwn',
-          text: `*Pull Request* <${context.payload.pull_request.url}|${context.payload.pull_request.url}>`,
+          text: `* Pull Request* <${context.payload.pull_request.url}| ${context.payload.pull_request.url} > `,
         },
       },
     ],

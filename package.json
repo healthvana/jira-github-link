@@ -16,7 +16,6 @@
     "lodash": "^4.17.21",
     "octokit": "^1.7.1"
   },
-  "type": "module",
   "devDependencies": {
     "@types/lodash": "^4.14.178",
     "@types/node": "^16.11.13",

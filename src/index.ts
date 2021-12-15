@@ -1,15 +1,13 @@
 // import { createRequire } from 'module';
 // const require = createRequire(import.meta.url);
 
-import lodash from 'lodash';
-import JiraJS from 'jira.js';
+import { camelCase } from 'lodash';
+import { Version2Client } from 'jira.js';
 import core from '@actions/core';
 // import github from '@actions/github';
 import { IncomingWebhook } from '@slack/webhook';
 
 import CodeReviewNotification from '../templates/CodeReviewNotification';
-
-const { camelCase } = lodash;
 
 // ----FOR LOCAL DEV
 
@@ -18,8 +16,8 @@ const {
   JIRA_USER_EMAIL,
   JIRA_BASE_URL,
   SLACK_WEBHOOK_URL_DEV
-} = require('./devconfig.json');
-const users = require('./usermap.json');
+} = require('../devconfig.json');
+const users = require('../usermap.json');
 
 const github = {
   issues: {
@@ -51,7 +49,6 @@ const github = {
 // const { SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
 
 // Setup Jira client
-const { Version2Client } = JiraJS;
 const jira = new Version2Client({
   host: JIRA_BASE_URL,
   authentication: {
@@ -239,7 +236,7 @@ const onPRCreateOrReview = async () => {
           ...requestBodyBase
         };
         // assign to Code Reviewer in Jira
-        return await jira.issues.editIssue(finalRequestBody);
+        // return await jira.issues.editIssue(finalRequestBody);
       })
     );
     // Send only one notification to Slack with all issues
