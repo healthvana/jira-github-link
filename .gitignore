@@ -1,4 +1,4 @@
 devconfig.*
 node_modules/
 .DS_STORE
-usermap.json
+usersMap.json

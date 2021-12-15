@@ -1,11 +1,11 @@
 import core from '@actions/core';
-import github from '@actions/github';
+// import github from '@actions/github';
 import { IncomingWebhook } from '@slack/webhook';
 import { Version2Client } from 'jira.js';
 import { camelCase } from 'lodash';
 
 import CodeReviewNotification from './templates/CodeReviewNotification';
-import users from '../usermap.json';
+import users from '../usersMap.json';
 
 // ----FOR LOCAL DEV
 
@@ -42,10 +42,10 @@ import users from '../usermap.json';
 //   }
 // };
 
-
-const webhookURL = SLACK_WEBHOOK_URL_DEV;
 // --- FOR PROD
 const { SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
+const webhookURL = SLACK_WEBHOOK_URL_DEV;
+
 
 // Setup Jira client
 const jira = new Version2Client({
@@ -185,7 +185,7 @@ const getReviewersInfo = () => {
 
   // find the user in the map
   return requested_reviewers.map(({ login }) => {
-    return users.find(user => user.github === login);
+    return users.find(user => user.github.account === login);
   });
 };
 
@@ -207,9 +207,9 @@ const onPRCreateOrReview = async () => {
   // Get the reviewer's info from the usersmap
   const reviewersInfo = getReviewersInfo();
   const reviewersInJira = reviewersInfo.map(r => {
-    return { accountId: r.jiraAccountId };
+    return { accountId: r.jira.accountId };
   });
-  let reviewersInSlackList = reviewersInfo.map(reviewer => `<@${reviewer.slack}>`);
+  let reviewersInSlackList = reviewersInfo.map(reviewer => `<@${reviewer.slack.id}>`);
   let reviewersInSlack = reviewersInSlackList.join(', ')
 
   const requestBodyBase = {
@@ -238,6 +238,7 @@ const onPRCreateOrReview = async () => {
     // Send only one notification to Slack with all issues
     const json = CodeReviewNotification(issues, context);
     await webhook.send(json);
+    // console.log(json)
   } catch (e) {
     console.log(e);
   }
