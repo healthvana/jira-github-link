@@ -1,4 +1,4 @@
-const CodeReviewTemplate = (issue, context) => {
+const CodeReviewTemplate = (issue:object, context:object) => {
   return {
     blocks: [
       {

@@ -1,5 +1,5 @@
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
+// import { createRequire } from 'module';
+// const require = createRequire(import.meta.url);
 
 import lodash from 'lodash';
 import JiraJS from 'jira.js';
@@ -7,7 +7,7 @@ import core from '@actions/core';
 // import github from '@actions/github';
 import { IncomingWebhook } from '@slack/webhook';
 
-import CodeReviewNotification from './templates/CodeReviewNotification.js';
+import CodeReviewNotification from '../templates/CodeReviewNotification';
 
 const { camelCase } = lodash;
 
@@ -22,6 +22,9 @@ const {
 const users = require('./usermap.json');
 
 const github = {
+  issues: {
+    addLabels: (config) => config
+  },
   context: {
     payload: {
       pull_request: {
@@ -31,9 +34,10 @@ const github = {
           ref: 'i/HV2-3261/akjshdkjh'
         }
       },
+      number: 1,
       repository: {
         name: 'h',
-        owner: 'healthvana'
+        owner: { login: 'healthvana' }
       },
       requested_reviewers: [
         {
@@ -44,7 +48,7 @@ const github = {
   }
 };
 // --- FOR PROD
-// const { SLACK_WEBHOOK_URL, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
+// const { SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
 
 // Setup Jira client
 const { Version2Client } = JiraJS;
@@ -62,7 +66,7 @@ const jira = new Version2Client({
 const context = github.context;
 
 //Setup Slack Client
-const webhook = new IncomingWebhook(SLACK_WEBHOOK_URL);
+const webhook = new IncomingWebhook(SLACK_WEBHOOK_URL_DEV);
 
 // ----------WORKFLOW
 /**
@@ -123,7 +127,10 @@ const getIssueKeysfromBranch = async () => {
  * @param {Array} keys An array of strings of issue keys
  * @returns {Array} The information from Jira for those issue keys
  */
-const getIssueInfoFromKeys = async keys => {
+const getIssueInfoFromKeys = async (keys: string[] | Error) => {
+  if (keys instanceof Error) {
+    return;
+  }
   const issuesData = await Promise.all(
     keys.map(async key => {
       let data = null;
@@ -150,21 +157,23 @@ const getIssueInfoFromKeys = async keys => {
  * @param {Object} issue An issue from Jira
  * @returns {Object} The issue with custom fields translated to plain text
  */
-const formatCustomFields = issue => {
-  //Prepare custom field referance table.
+const formatCustomFields = (issue) => {
+  console.log('issue::', issue);
   const { names: customFields } = issue;
+  let fieldMap = {};
   Object.keys(customFields)
     .filter(jiraName => {
       return jiraName.includes('custom');
     })
     .forEach(jiraName => {
-      // console.log('jiraName::', jiraName);
       const formattedKey = camelCase(customFields[jiraName]);
       const value = issue.fields[jiraName];
+      fieldMap[formattedKey] = jiraName;
       issue.fields[formattedKey] = value;
-      delete issue.names;
       delete issue.fields[jiraName];
     });
+  // replace the old names area with the new map
+  issue.names = fieldMap;
   return issue;
 };
 
@@ -200,21 +209,18 @@ const onPRCreateOrReview = async () => {
 
   // Get the reviewer's info from the usersmap
   const reviewersInfo = getReviewersInfo();
-  const cfCodeReviewerField = customFieldsMap['Code Reviewer(s)'];
-  const cfEpicLink = customFieldsMap['Epic Link'];
-
   const reviewersInJira = reviewersInfo.map(r => {
     return { accountId: r.jiraAccountId };
   });
-  let reviewersInSlack = reviewersInfo.map(reviewer => `<@${reviewer.slack}>`);
-  reviewersInSlack =
-    reviewersInSlack.length > 1
-      ? `${reviewersInSlack.join(', ')} are assigned`
-      : `${reviewersInSlack[0]} is assigned.`;
+  let reviewersInSlackList = reviewersInfo.map(reviewer => `<@${reviewer.slack}>`);
+  let reviewersInSlack =
+    reviewersInSlackList.length > 1
+      ? `${reviewersInSlackList.join(', ')} are assigned`
+      : `${reviewersInSlackList[0]} is assigned.`;
 
   const requestBodyBase = {
     fields: {
-      [cfCodeReviewerField]: reviewersInJira
+      [issues[0].names["codeReviewerS"]]: reviewersInJira
     }
   };
 
@@ -224,7 +230,7 @@ const onPRCreateOrReview = async () => {
     reviwerAssignResponse = await Promise.all(
       issues.map(async issue => {
         issue.reviewersInSlack = reviewersInSlack;
-        issue.epic = issue.fields[cfEpicLink];
+        issue.epic = issue.fields.epicLink;
         issue.epicURL = `${JIRA_BASE_URL}browse/${issue.epic}`;
         issue.browseURL = `${JIRA_BASE_URL}browse/${issue.key}`;
 
