@@ -11,13 +11,15 @@ import CodeReviewNotification from '../templates/CodeReviewNotification';
 
 // ----FOR LOCAL DEV
 
-const {
+import {
   JIRA_API_TOKEN,
   JIRA_USER_EMAIL,
   JIRA_BASE_URL,
   SLACK_WEBHOOK_URL_DEV
-} = require('../devconfig.json');
-const users = require('../usermap.json');
+} from '../devconfig.json';
+import users from '../usermap.json';
+
+const webhookURL = SLACK_WEBHOOK_URL_DEV;
 
 const github = {
   issues: {
@@ -63,7 +65,7 @@ const jira = new Version2Client({
 const context = github.context;
 
 //Setup Slack Client
-const webhook = new IncomingWebhook(SLACK_WEBHOOK_URL_DEV);
+const webhook = new IncomingWebhook(webhookURL);
 
 // ----------WORKFLOW
 /**
@@ -120,42 +122,11 @@ const getIssueKeysfromBranch = async () => {
 };
 
 /**
- *
- * @param {Array} keys An array of strings of issue keys
- * @returns {Array} The information from Jira for those issue keys
- */
-const getIssueInfoFromKeys = async (keys: string[] | Error) => {
-  if (keys instanceof Error) {
-    return;
-  }
-  const issuesData = await Promise.all(
-    keys.map(async key => {
-      let data = null;
-      try {
-        data = await jira.issues.getIssue({
-          issueIdOrKey: key,
-          expand: 'names'
-        });
-      } catch (e) {
-        console.error(
-          `Issue ${key} could not be found in Jira or could not be fetched:`
-        );
-        console.error(e);
-      }
-      return data;
-    })
-  );
-  // core.setOutput('issuesData', issuesData);
-  return issuesData;
-};
-
-/**
  * Mutates and transforms the standard Jira issue JSON format for easier use in templating
  * @param {Object} issue An issue from Jira
  * @returns {Object} The issue with custom fields translated to plain text
  */
 const formatCustomFields = (issue) => {
-  console.log('issue::', issue);
   const { names: customFields } = issue;
   let fieldMap = {};
   Object.keys(customFields)
@@ -173,6 +144,54 @@ const formatCustomFields = (issue) => {
   issue.names = fieldMap;
   return issue;
 };
+
+
+/**
+ *
+ * @param {Array} keys An array of strings of issue keys
+ * @returns {Array} The information from Jira for those issue keys
+ */
+const getIssueInfoFromKeys = async (keys: string[] | Error) => {
+  if (keys instanceof Error) return;
+  const issuesData = await Promise.all(
+    keys.map(async key => {
+      let data = null;
+      try {
+        data = await jira.issues.getIssue({
+          issueIdOrKey: key,
+          expand: 'names'
+        });
+      } catch (e) {
+        console.error(
+          `Issue ${key} could not be found in Jira or could not be fetched:`
+        );
+        return new Error(e);
+      }
+      return data;
+    })
+  );
+  return issuesData.map(formatCustomFields);
+};
+
+
+
+/*  const completeData = await Promise.all(
+    formattedIssueData.map(async issue => {
+      let epicData;
+      try {
+        epicData = await jira.issues.getIssue({
+          issueIdOrKey: issue.fields.epicLink,
+          expand: 'names'
+        });
+      } catch (e) {
+        `Issue ${issue.fields.epicLink} could not be found in Jira or could not be fetched:`
+        return new Error(e)
+      }
+      epicData = formatCustomFields(epicData);
+      issue.epic = epicData;
+    });
+  ); */
+
 
 /**
  *
@@ -195,14 +214,14 @@ const onPRCreateOrReview = async () => {
 
   // Get the info from Jira for those issue keys
   let issues = [];
+  if (keys instanceof Error) {
+    return keys;
+  }
   try {
     issues = await getIssueInfoFromKeys(keys);
   } catch (e) {
     return new Error('Unable to return issue info');
   }
-  // Fields should be the same across the board,
-  // so just grab the first issue
-  issues = issues.map(formatCustomFields);
 
   // Get the reviewer's info from the usersmap
   const reviewersInfo = getReviewersInfo();
@@ -210,10 +229,7 @@ const onPRCreateOrReview = async () => {
     return { accountId: r.jiraAccountId };
   });
   let reviewersInSlackList = reviewersInfo.map(reviewer => `<@${reviewer.slack}>`);
-  let reviewersInSlack =
-    reviewersInSlackList.length > 1
-      ? `${reviewersInSlackList.join(', ')} are assigned`
-      : `${reviewersInSlackList[0]} is assigned.`;
+  let reviewersInSlack = reviewersInSlackList.join(', ')
 
   const requestBodyBase = {
     fields: {
@@ -227,8 +243,7 @@ const onPRCreateOrReview = async () => {
     reviwerAssignResponse = await Promise.all(
       issues.map(async issue => {
         issue.reviewersInSlack = reviewersInSlack;
-        issue.epic = issue.fields.epicLink;
-        issue.epicURL = `${JIRA_BASE_URL}browse/${issue.epic}`;
+        issue.epicURL = `${JIRA_BASE_URL}browse/${issue.fields.epicLink}`;
         issue.browseURL = `${JIRA_BASE_URL}browse/${issue.key}`;
 
         const finalRequestBody = {
@@ -241,14 +256,11 @@ const onPRCreateOrReview = async () => {
     );
     // Send only one notification to Slack with all issues
     const json = CodeReviewNotification(issues, context);
-
-    console.log(json);
-
     // await webhook.send(json);
   } catch (e) {
     console.log(e);
   }
-  // TO DO: transition issue, send Slack notification
+  // TO DO: transition issue
   //
 };
 onPRCreateOrReview();
