@@ -1,16 +1,23 @@
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
+
+import lodash from 'lodash';
 import JiraJS from 'jira.js';
 import core from '@actions/core';
 // import github from '@actions/github';
 import { IncomingWebhook } from '@slack/webhook';
 
+import CodeReviewNotification from './templates/CodeReviewNotification.js';
+
+const { camelCase } = lodash;
+
 // ----FOR LOCAL DEV
-import { createRequire } from 'module';
-const require = createRequire(import.meta.url);
+
 const {
   JIRA_API_TOKEN,
   JIRA_USER_EMAIL,
   JIRA_BASE_URL,
-  SLACK_WEBHOOK_URL
+  SLACK_WEBHOOK_URL_DEV
 } = require('./devconfig.json');
 const users = require('./usermap.json');
 
@@ -79,14 +86,17 @@ const getIssueKeysfromBranch = async () => {
     }
   } = payload;
   // console.log('payload::', payload);
-  // Get every possible project key from Jira
+
+  // Get all existing project keys from Jira
   const projectsInfo = await jira.projects.getAllProjects();
   const projects = projectsInfo.map(prj => prj.key);
+
   // Look for possible keys using this regex
   const projectsRegex = `((${projects.join('|')})-\\d{1,})`;
   const regexp = new RegExp(projectsRegex, 'gi');
   const branchMatches = branch.match(regexp);
   const titleMatches = title.match(regexp);
+
   // If none, throw; label PR
   if (!branchMatches?.length && !titleMatches?.length) {
     try {
@@ -108,10 +118,12 @@ const getIssueKeysfromBranch = async () => {
   return [...new Set(branchMatches.concat(titleMatches))];
 };
 
-/*
-
-*/
-const getIssueInfoFromBranchName = async keys => {
+/**
+ *
+ * @param {Array} keys An array of strings of issue keys
+ * @returns {Array} The information from Jira for those issue keys
+ */
+const getIssueInfoFromKeys = async keys => {
   const issuesData = await Promise.all(
     keys.map(async key => {
       let data = null;
@@ -129,19 +141,31 @@ const getIssueInfoFromBranchName = async keys => {
       return data;
     })
   );
-
   // core.setOutput('issuesData', issuesData);
   return issuesData;
 };
 
-const formatCustomFields = issueInfo => {
+/**
+ * Mutates and transforms the standard Jira issue JSON format for easier use in templating
+ * @param {Object} issue An issue from Jira
+ * @returns {Object} The issue with custom fields translated to plain text
+ */
+const formatCustomFields = issue => {
   //Prepare custom field referance table.
-  const { names: customFields } = issueInfo;
-  let customFieldMap = {};
-  Object.keys(customFields).forEach(jiraName => {
-    customFieldMap[customFields[jiraName]] = jiraName;
-  });
-  return customFieldMap;
+  const { names: customFields } = issue;
+  Object.keys(customFields)
+    .filter(jiraName => {
+      return jiraName.includes('custom');
+    })
+    .forEach(jiraName => {
+      // console.log('jiraName::', jiraName);
+      const formattedKey = camelCase(customFields[jiraName]);
+      const value = issue.fields[jiraName];
+      issue.fields[formattedKey] = value;
+      delete issue.names;
+      delete issue.fields[jiraName];
+    });
+  return issue;
 };
 
 /**
@@ -160,15 +184,19 @@ const getReviewersInfo = () => {
 };
 
 const onPRCreateOrReview = async () => {
+  // Get the issue keys from the PR title and branch name
   const keys = await getIssueKeysfromBranch();
-  let issuesInfo = [];
+
+  // Get the info from Jira for those issue keys
+  let issues = [];
   try {
-    issuesInfo = await getIssueInfoFromBranchName(keys);
+    issues = await getIssueInfoFromKeys(keys);
   } catch (e) {
     return new Error('Unable to return issue info');
   }
-  // Fields should be the same across the board
-  const customFieldsMap = formatCustomFields(issuesInfo[0]);
+  // Fields should be the same across the board,
+  // so just grab the first issue
+  issues = issues.map(formatCustomFields);
 
   // Get the reviewer's info from the usersmap
   const reviewersInfo = getReviewersInfo();
@@ -194,71 +222,26 @@ const onPRCreateOrReview = async () => {
 
   try {
     reviwerAssignResponse = await Promise.all(
-      issuesInfo.map(async issue => {
-        await webhook.send({
-          blocks: [
-            {
-              type: 'header',
-              text: {
-                type: 'plain_text',
-                text: `Code Review Requested`,
-                emoji: true
-              }
-            },
-            {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text: reviewersInSlack
-              }
-            },
-            {
-              type: 'header',
-              text: {
-                type: 'plain_text',
-                text: 'Jira',
-                emoji: true
-              }
-            },
-            {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text: `*Issue:* <${JIRA_BASE_URL}browse/${issue.key}}|${issue.key}>`
-              }
-            },
-            {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text: `*Epic:* <${JIRA_BASE_URL}browse/${issue[cfEpicLink]}|${issue[cfEpicLink]}>`
-              }
-            },
-            {
-              type: 'header',
-              text: {
-                type: 'plain_text',
-                text: 'Github',
-                emoji: true
-              }
-            },
-            {
-              type: 'section',
-              text: {
-                type: 'mrkdwn',
-                text: `*Pull Request* <${context.payload.pull_request.url}|${context.payload.pull_request.url}>`
-              }
-            }
-          ]
-        });
+      issues.map(async issue => {
+        issue.reviewersInSlack = reviewersInSlack;
+        issue.epic = issue.fields[cfEpicLink];
+        issue.epicURL = `${JIRA_BASE_URL}browse/${issue.epic}`;
+        issue.browseURL = `${JIRA_BASE_URL}browse/${issue.key}`;
 
         const finalRequestBody = {
           issueIdOrKey: issue.key,
           ...requestBodyBase
         };
+        // assign to Code Reviewer in Jira
         return await jira.issues.editIssue(finalRequestBody);
       })
     );
+    // Send only one notification to Slack with all issues
+    const json = CodeReviewNotification(issues, context);
+
+    console.log(json);
+
+    // await webhook.send(json);
   } catch (e) {
     console.log(e);
   }
