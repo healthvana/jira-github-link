@@ -10,7 +10,7 @@ const {
   JIRA_API_TOKEN,
   JIRA_USER_EMAIL,
   JIRA_BASE_URL,
-  SLACK_WEBHOOK_URL,
+  SLACK_WEBHOOK_URL
 } = require('./devconfig.json');
 const users = require('./usermap.json');
 
@@ -18,22 +18,23 @@ const github = {
   context: {
     payload: {
       pull_request: {
+        url: 'https://github.com/healthvana/h/pull/6433',
         title: 'HV2-3261 - something',
         head: {
-          ref: 'i/HV2-3261/akjshdkjh',
-        },
+          ref: 'i/HV2-3261/akjshdkjh'
+        }
       },
       repository: {
         name: 'h',
-        owner: 'healthvana',
+        owner: 'healthvana'
       },
       requested_reviewers: [
         {
-          login: 'michaelkunc',
-        },
-      ],
-    },
-  },
+          login: 'michaelkunc'
+        }
+      ]
+    }
+  }
 };
 // --- FOR PROD
 // const { SLACK_WEBHOOK_URL, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
@@ -45,10 +46,10 @@ const jira = new Version2Client({
   authentication: {
     basic: {
       email: JIRA_USER_EMAIL,
-      apiToken: JIRA_API_TOKEN,
-    },
+      apiToken: JIRA_API_TOKEN
+    }
   },
-  telemetry: false,
+  telemetry: false
 });
 
 const context = github.context;
@@ -69,13 +70,13 @@ const getIssueKeysfromBranch = async () => {
   const {
     pull_request: {
       title,
-      head: { ref: branch },
+      head: { ref: branch }
     },
     number: issue_number,
     repository: {
       name: repo,
-      owner: { login: owner },
-    },
+      owner: { login: owner }
+    }
   } = payload;
   // console.log('payload::', payload);
   // Get every possible project key from Jira
@@ -93,7 +94,7 @@ const getIssueKeysfromBranch = async () => {
         owner,
         repo,
         issue_number,
-        label: [{ name: 'NO JIRA TICKET' }],
+        label: [{ name: 'NO JIRA TICKET' }]
       });
     } catch (e) {
       return new Error(
@@ -117,7 +118,7 @@ const getIssueInfoFromBranchName = async keys => {
       try {
         data = await jira.issues.getIssue({
           issueIdOrKey: key,
-          expand: 'names',
+          expand: 'names'
         });
       } catch (e) {
         console.error(
@@ -149,7 +150,7 @@ const formatCustomFields = issueInfo => {
  */
 const getReviewersInfo = () => {
   const {
-    payload: { requested_reviewers },
+    payload: { requested_reviewers }
   } = context;
 
   // find the user in the map
@@ -168,39 +169,100 @@ const onPRCreateOrReview = async () => {
   }
   // Fields should be the same across the board
   const customFieldsMap = formatCustomFields(issuesInfo[0]);
+
+  // Get the reviewer's info from the usersmap
   const reviewersInfo = getReviewersInfo();
   const cfCodeReviewerField = customFieldsMap['Code Reviewer(s)'];
+  const cfEpicLink = customFieldsMap['Epic Link'];
 
-  let response;
   const reviewersInJira = reviewersInfo.map(r => {
-    console.log('reviewer in loop', r);
     return { accountId: r.jiraAccountId };
   });
+  let reviewersInSlack = reviewersInfo.map(reviewer => `<@${reviewer.slack}>`);
+  reviewersInSlack =
+    reviewersInSlack.length > 1
+      ? `${reviewersInSlack.join(', ')} are assigned`
+      : `${reviewersInSlack[0]} is assigned.`;
+
   const requestBodyBase = {
     fields: {
-      [cfCodeReviewerField]: reviewersInJira,
-      summary: 'This is from an automation again',
-    },
+      [cfCodeReviewerField]: reviewersInJira
+    }
   };
+
+  let reviwerAssignResponse;
+
   try {
-    response = await Promise.all(
+    reviwerAssignResponse = await Promise.all(
       issuesInfo.map(async issue => {
+        await webhook.send({
+          blocks: [
+            {
+              type: 'header',
+              text: {
+                type: 'plain_text',
+                text: `Code Review Requested`,
+                emoji: true
+              }
+            },
+            {
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: reviewersInSlack
+              }
+            },
+            {
+              type: 'header',
+              text: {
+                type: 'plain_text',
+                text: 'Jira',
+                emoji: true
+              }
+            },
+            {
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: `*Issue:* <${JIRA_BASE_URL}browse/${issue.key}}|${issue.key}>`
+              }
+            },
+            {
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: `*Epic:* <${JIRA_BASE_URL}browse/${issue[cfEpicLink]}|${issue[cfEpicLink]}>`
+              }
+            },
+            {
+              type: 'header',
+              text: {
+                type: 'plain_text',
+                text: 'Github',
+                emoji: true
+              }
+            },
+            {
+              type: 'section',
+              text: {
+                type: 'mrkdwn',
+                text: `*Pull Request* <${context.payload.pull_request.url}|${context.payload.pull_request.url}>`
+              }
+            }
+          ]
+        });
+
         const finalRequestBody = {
           issueIdOrKey: issue.key,
-          ...requestBodyBase,
+          ...requestBodyBase
         };
-        console.log('finalRequestBody::', JSON.stringify(finalRequestBody));
         return await jira.issues.editIssue(finalRequestBody);
       })
     );
   } catch (e) {
     console.log(e);
   }
-
-  console.log('response::', response);
-
-  // await webhook.send({
-  //   text: "test",
-  // });
+  // TO DO: transition issue, send Slack notification
+  //
 };
 onPRCreateOrReview();
