@@ -100,12 +100,8 @@ const getIssueKeysfromBranch = async () => {
   // If none, throw; label PR
   if (!branchMatches?.length && !titleMatches?.length) {
     try {
-      // github.issues.addLabels({
-      //   owner,
-      //   repo,
-      //   issue_number,
-      //   label: [{ name: 'NO JIRA TICKET' }]
-      // });
+      // TO DO: Label branch if no ticket
+      // need to authenticate to get an octokit instance
     } catch (e) {
       return new Error(
         `No issue keys found in branch name "${branch} and unable to label PR."`
