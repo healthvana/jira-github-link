@@ -1,0 +1,442 @@
+[
+  {
+    "slack": {
+      "id": "U022HF6QFL5"
+    },
+    "jira": {
+      "accountId": "60a6a84b9b362f0069248916",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/60a6a84b9b362f0069248916/894f3d47-e1c4-4ee4-85f3-5b0f89eae8bf/16",
+        "24x24": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/60a6a84b9b362f0069248916/894f3d47-e1c4-4ee4-85f3-5b0f89eae8bf/24",
+        "32x32": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/60a6a84b9b362f0069248916/894f3d47-e1c4-4ee4-85f3-5b0f89eae8bf/32",
+        "48x48": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/60a6a84b9b362f0069248916/894f3d47-e1c4-4ee4-85f3-5b0f89eae8bf/48"
+      },
+      "displayName": "andrew.sanchez",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=60a6a84b9b362f0069248916"
+    },
+    "github": {
+      "account": "andrewsanchez",
+      "displayNames": ["Andrew Sanchez"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U3281SE91"
+    },
+    "jira": {
+      "accountId": "557058:9688b1bb-1571-44bd-8601-908b9c0caa8d",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/f984ddb0c34118aac9c78cfa5b7a9738?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAR-2.png",
+        "24x24": "https://secure.gravatar.com/avatar/f984ddb0c34118aac9c78cfa5b7a9738?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAR-2.png",
+        "32x32": "https://secure.gravatar.com/avatar/f984ddb0c34118aac9c78cfa5b7a9738?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAR-2.png",
+        "48x48": "https://secure.gravatar.com/avatar/f984ddb0c34118aac9c78cfa5b7a9738?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FAR-2.png"
+      },
+      "displayName": "Amor Risch",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=557058:9688b1bb-1571-44bd-8601-908b9c0caa8d",
+      "timeZone": "America/Los_Angeles"
+    },
+    "github": {
+      "account": "arisch",
+      "displayNames": ["Amor Risch", "A Risch"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U0125E5RJHK"
+    },
+    "jira": {
+      "accountId": "5ea6f1f27dab3a0bb4e4b682",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/cbc2bd4f5941666a4e5012278dfb77fe?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCN-3.png",
+        "24x24": "https://secure.gravatar.com/avatar/cbc2bd4f5941666a4e5012278dfb77fe?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCN-3.png",
+        "32x32": "https://secure.gravatar.com/avatar/cbc2bd4f5941666a4e5012278dfb77fe?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCN-3.png",
+        "48x48": "https://secure.gravatar.com/avatar/cbc2bd4f5941666a4e5012278dfb77fe?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FCN-3.png"
+      },
+      "displayName": "Colleen Nelson",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=5ea6f1f27dab3a0bb4e4b682"
+    },
+    "github": {
+      "account": "ColleenN",
+      "displayNames": ["Colleen Nelson"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U0252HEM8M7"
+    },
+    "jira": {
+      "accountId": "60c14ea6a01e11006aedf750",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/4ccb7b740010a6a1e042391d790729f4?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDJ-3.png",
+        "24x24": "https://secure.gravatar.com/avatar/4ccb7b740010a6a1e042391d790729f4?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDJ-3.png",
+        "32x32": "https://secure.gravatar.com/avatar/4ccb7b740010a6a1e042391d790729f4?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDJ-3.png",
+        "48x48": "https://secure.gravatar.com/avatar/4ccb7b740010a6a1e042391d790729f4?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDJ-3.png"
+      },
+      "displayName": "Dahe Jun",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=60c14ea6a01e11006aedf750",
+      "timeZone": "US/Eastern"
+    },
+    "github": {
+      "account": "dahejun",
+      "displayNames": ["Dahe Jun"]
+    }
+  },
+  {
+    "slack": {
+      "id": "UPHBYAEDS"
+    },
+    "jira": {
+      "accountId": "5da8f0eca539480c3b2ec4cb",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/7dc7ff310e734fbbd1cffe92b8ff808a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDJ-0.png",
+        "24x24": "https://secure.gravatar.com/avatar/7dc7ff310e734fbbd1cffe92b8ff808a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDJ-0.png",
+        "32x32": "https://secure.gravatar.com/avatar/7dc7ff310e734fbbd1cffe92b8ff808a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDJ-0.png",
+        "48x48": "https://secure.gravatar.com/avatar/7dc7ff310e734fbbd1cffe92b8ff808a?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDJ-0.png"
+      },
+      "displayName": "Dani Jordan",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=5da8f0eca539480c3b2ec4cb"
+    },
+    "github": {
+      "account": "milkwitch",
+      "displayNames": ["Dani Jordan"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U3SMX4G12"
+    },
+    "jira": {
+      "accountId": "557058:6f2c68c5-7a3c-423c-b13e-f1d703f26b2c",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/6ee3591fd709f90acf3a868a3594856d?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDT-6.png",
+        "24x24": "https://secure.gravatar.com/avatar/6ee3591fd709f90acf3a868a3594856d?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDT-6.png",
+        "32x32": "https://secure.gravatar.com/avatar/6ee3591fd709f90acf3a868a3594856d?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDT-6.png",
+        "48x48": "https://secure.gravatar.com/avatar/6ee3591fd709f90acf3a868a3594856d?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FDT-6.png"
+      },
+      "displayName": "Dave Thomas",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=557058:6f2c68c5-7a3c-423c-b13e-f1d703f26b2c"
+    },
+    "github": {
+      "account": "pihdave",
+      "displayNames": ["Dave Thomas", "David Thomas"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U018BAJN9H8"
+    },
+    "jira": {
+      "accountId": "5f2b16a1a16487001560844d",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5f2b16a1a16487001560844d/427e2bae-69c8-48b0-83e9-b422e6bfbfe5/16",
+        "24x24": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5f2b16a1a16487001560844d/427e2bae-69c8-48b0-83e9-b422e6bfbfe5/24",
+        "32x32": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5f2b16a1a16487001560844d/427e2bae-69c8-48b0-83e9-b422e6bfbfe5/32",
+        "48x48": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/5f2b16a1a16487001560844d/427e2bae-69c8-48b0-83e9-b422e6bfbfe5/48"
+      },
+      "displayName": "David Siedband",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=5f2b16a1a16487001560844d"
+    },
+    "github": {
+      "account": "siebo",
+      "displayNames": ["David Siedband"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U03PY1T1R"
+    },
+    "jira": {
+      "accountId": "70121:c024ef4d-2cdf-4f60-8df7-ad2e332a9f4d",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/70121:c024ef4d-2cdf-4f60-8df7-ad2e332a9f4d/c6479d0e-f0d8-447f-9e35-30f606064585/16",
+        "24x24": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/70121:c024ef4d-2cdf-4f60-8df7-ad2e332a9f4d/c6479d0e-f0d8-447f-9e35-30f606064585/24",
+        "32x32": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/70121:c024ef4d-2cdf-4f60-8df7-ad2e332a9f4d/c6479d0e-f0d8-447f-9e35-30f606064585/32",
+        "48x48": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/70121:c024ef4d-2cdf-4f60-8df7-ad2e332a9f4d/c6479d0e-f0d8-447f-9e35-30f606064585/48"
+      },
+      "displayName": "Ian Evanoff",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=70121:c024ef4d-2cdf-4f60-8df7-ad2e332a9f4d",
+      "timeZone": "America/Chicago"
+    },
+    "github": {
+      "account": "ianoff",
+      "displayNames": ["Ian Evanoff", "Ian"]
+    }
+  },
+  {
+    "slack": {
+      "id": "UFMHXL7PG"
+    },
+    "jira": {
+      "accountId": "5ce32eb2dfe2e60fdd115ad4",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/a4f04ad5ab674e51fb369cef7a17cddc?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FIH-3.png",
+        "24x24": "https://secure.gravatar.com/avatar/a4f04ad5ab674e51fb369cef7a17cddc?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FIH-3.png",
+        "32x32": "https://secure.gravatar.com/avatar/a4f04ad5ab674e51fb369cef7a17cddc?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FIH-3.png",
+        "48x48": "https://secure.gravatar.com/avatar/a4f04ad5ab674e51fb369cef7a17cddc?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FIH-3.png"
+      },
+      "displayName": "India Halm",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=5ce32eb2dfe2e60fdd115ad4"
+    },
+    "github": {
+      "account": "noriwasabi",
+      "displayNames": ["India Halm"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U029FPUQ25D"
+    },
+    "jira": {
+      "accountId": "60ef0db2081fcd0070c4150d",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/2f3611b658708924125576df54d589e9?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJL-5.png",
+        "24x24": "https://secure.gravatar.com/avatar/2f3611b658708924125576df54d589e9?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJL-5.png",
+        "32x32": "https://secure.gravatar.com/avatar/2f3611b658708924125576df54d589e9?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJL-5.png",
+        "48x48": "https://secure.gravatar.com/avatar/2f3611b658708924125576df54d589e9?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJL-5.png"
+      },
+      "displayName": "Jamie Lee",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=60ef0db2081fcd0070c4150d"
+    },
+    "github": {
+      "displayNames": ["Jamie Lee"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U03PZPK9S"
+    },
+    "jira": {},
+    "github": {
+      "account": "JimKawa",
+      "displayNames": ["Jim Kawa"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U1H7EBV8E"
+    },
+    "jira": {
+      "accountId": "557058:bd3f10fc-5c53-44c4-88fb-cc7464954122",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/ee012c90523b4fc07551eae047b8cfc3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJC-3.png",
+        "24x24": "https://secure.gravatar.com/avatar/ee012c90523b4fc07551eae047b8cfc3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJC-3.png",
+        "32x32": "https://secure.gravatar.com/avatar/ee012c90523b4fc07551eae047b8cfc3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJC-3.png",
+        "48x48": "https://secure.gravatar.com/avatar/ee012c90523b4fc07551eae047b8cfc3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJC-3.png"
+      },
+      "displayName": "Jim Cooley",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=557058:bd3f10fc-5c53-44c4-88fb-cc7464954122",
+      "timeZone": "America/Los_Angeles"
+    },
+    "github": {
+      "account": "jimcooley",
+      "displayNames": ["Jim Cooley"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U03LS8SPP"
+    },
+    "jira": {
+      "accountId": "557058:e98777c1-d43d-42bf-a9cb-a5b95b54fdf9",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/557058:e98777c1-d43d-42bf-a9cb-a5b95b54fdf9/fbb92fb3-22c0-4c56-b4e0-5769fe85ce30/16",
+        "24x24": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/557058:e98777c1-d43d-42bf-a9cb-a5b95b54fdf9/fbb92fb3-22c0-4c56-b4e0-5769fe85ce30/24",
+        "32x32": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/557058:e98777c1-d43d-42bf-a9cb-a5b95b54fdf9/fbb92fb3-22c0-4c56-b4e0-5769fe85ce30/32",
+        "48x48": "https://avatar-management--avatars.us-west-2.prod.public.atl-paas.net/557058:e98777c1-d43d-42bf-a9cb-a5b95b54fdf9/fbb92fb3-22c0-4c56-b4e0-5769fe85ce30/48"
+      },
+      "displayName": "Jordan Bouvier",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=557058:e98777c1-d43d-42bf-a9cb-a5b95b54fdf9",
+      "timeZone": "America/Chicago"
+    },
+    "github": {
+      "account": "jbouvier",
+      "displayNames": ["Jordan Bouvier", "Jordan"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U02EJBQ4YT0"
+    },
+    "jira": {
+      "accountId": "613bde5c70405d006818828a",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/1a107841ace94b8831577e2e2a8660a1?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJK-3.png",
+        "24x24": "https://secure.gravatar.com/avatar/1a107841ace94b8831577e2e2a8660a1?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJK-3.png",
+        "32x32": "https://secure.gravatar.com/avatar/1a107841ace94b8831577e2e2a8660a1?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJK-3.png",
+        "48x48": "https://secure.gravatar.com/avatar/1a107841ace94b8831577e2e2a8660a1?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FJK-3.png"
+      },
+      "displayName": "Jordan King",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=613bde5c70405d006818828a"
+    },
+    "github": {
+      "account": "jordanking7",
+      "displayNames": ["Jordan King"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U02LY1W5ECF"
+    },
+    "jira": {
+      "accountId": "618f142d137a51006a7fa613",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/d7b7614beed7abfacdf6ce19ea5e22b4?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FKZ-3.png",
+        "24x24": "https://secure.gravatar.com/avatar/d7b7614beed7abfacdf6ce19ea5e22b4?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FKZ-3.png",
+        "32x32": "https://secure.gravatar.com/avatar/d7b7614beed7abfacdf6ce19ea5e22b4?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FKZ-3.png",
+        "48x48": "https://secure.gravatar.com/avatar/d7b7614beed7abfacdf6ce19ea5e22b4?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FKZ-3.png"
+      },
+      "displayName": "Kathy Zadrozny",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=618f142d137a51006a7fa613",
+      "timeZone": "America/Chicago"
+    },
+    "github": {
+      "account": "kzadrozny",
+      "displayNames": ["Kathy Zadrozny"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U01DE2UJSF6"
+    },
+    "jira": {},
+    "github": {
+      "account": "lilwillifo",
+      "displayNames": ["Margaret"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U01CJ6NLEUD"
+    },
+    "jira": {},
+    "github": {
+      "account": "michaelblasingame"
+    }
+  },
+  {
+    "slack": {
+      "id": "U012X3LTEBV"
+    },
+    "jira": {
+      "accountId": "5eaed025b882f90bae3d1b80",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/4bffd0728c6f99130707065f96df08e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FMK-2.png",
+        "24x24": "https://secure.gravatar.com/avatar/4bffd0728c6f99130707065f96df08e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FMK-2.png",
+        "32x32": "https://secure.gravatar.com/avatar/4bffd0728c6f99130707065f96df08e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FMK-2.png",
+        "48x48": "https://secure.gravatar.com/avatar/4bffd0728c6f99130707065f96df08e3?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FMK-2.png"
+      },
+      "displayName": "Mike Kunc",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=5eaed025b882f90bae3d1b80"
+    },
+    "github": {
+      "account": "michaelkunc",
+      "displayNames": ["Mike Kunc", "Michael Kunc"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U02FENMQN8Y"
+    },
+    "jira": {
+      "accountId": "613bde4ee2a0d60069e7288e",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/1700e76a2acd85dd24952d4c1b29bb45?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FPB-5.png",
+        "24x24": "https://secure.gravatar.com/avatar/1700e76a2acd85dd24952d4c1b29bb45?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FPB-5.png",
+        "32x32": "https://secure.gravatar.com/avatar/1700e76a2acd85dd24952d4c1b29bb45?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FPB-5.png",
+        "48x48": "https://secure.gravatar.com/avatar/1700e76a2acd85dd24952d4c1b29bb45?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FPB-5.png"
+      },
+      "displayName": "Paul Baisley",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=613bde4ee2a0d60069e7288e"
+    },
+    "github": {
+      "account": "wavinginspace",
+      "displayNames": ["Paul Baisley"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U06MXAQ5R"
+    },
+    "jira": {
+      "accountId": "557058:48051845-73fb-443e-b148-794c2b79c277",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/61f3dfa62dac6666276e7b82398a7de0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSW-0.png",
+        "24x24": "https://secure.gravatar.com/avatar/61f3dfa62dac6666276e7b82398a7de0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSW-0.png",
+        "32x32": "https://secure.gravatar.com/avatar/61f3dfa62dac6666276e7b82398a7de0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSW-0.png",
+        "48x48": "https://secure.gravatar.com/avatar/61f3dfa62dac6666276e7b82398a7de0?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FSW-0.png"
+      },
+      "displayName": "Sam Warmuth",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=557058:48051845-73fb-443e-b148-794c2b79c277",
+      "timeZone": "America/Chicago"
+    },
+    "github": {
+      "account": "SamWarmuth",
+      "displayNames": ["Sam Warmuth"]
+    }
+  },
+  {
+    "slack": {
+      "id": "U012WSQSCQ2"
+    },
+    "jira": {},
+    "github": {
+      "account": "SusieCastillo"
+    }
+  },
+  {
+    "slack": {
+      "id": "U01289RHASJ"
+    },
+    "jira": {
+      "accountId": "5ec5446ca65b000c45fae541",
+      "accountType": "atlassian",
+      "avatarUrls": {
+        "16x16": "https://secure.gravatar.com/avatar/459091bf317d153395a670e88126b60e?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FTW-2.png",
+        "24x24": "https://secure.gravatar.com/avatar/459091bf317d153395a670e88126b60e?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FTW-2.png",
+        "32x32": "https://secure.gravatar.com/avatar/459091bf317d153395a670e88126b60e?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FTW-2.png",
+        "48x48": "https://secure.gravatar.com/avatar/459091bf317d153395a670e88126b60e?d=https%3A%2F%2Favatar-management--avatars.us-west-2.prod.public.atl-paas.net%2Finitials%2FTW-2.png"
+      },
+      "displayName": "Toby Woolner",
+      "locale": "en_US",
+      "self": "https://healthvana.atlassian.net/rest/api/2/user?accountId=5ec5446ca65b000c45fae541"
+    },
+    "github": {
+      "account": "TJWX",
+      "displayNames": ["Toby Woolner"]
+    }
+  }
+]
