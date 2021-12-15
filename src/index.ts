@@ -100,12 +100,12 @@ const getIssueKeysfromBranch = async () => {
   // If none, throw; label PR
   if (!branchMatches?.length && !titleMatches?.length) {
     try {
-      github.issues.addLabels({
-        owner,
-        repo,
-        issue_number,
-        label: [{ name: 'NO JIRA TICKET' }]
-      });
+      // github.issues.addLabels({
+      //   owner,
+      //   repo,
+      //   issue_number,
+      //   label: [{ name: 'NO JIRA TICKET' }]
+      // });
     } catch (e) {
       return new Error(
         `No issue keys found in branch name "${branch} and unable to label PR."`
