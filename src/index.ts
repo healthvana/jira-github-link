@@ -235,7 +235,7 @@ const onPRCreateOrReview = async () => {
     // Send only one notification to Slack with all issues
     const json = {};
     const pull_request = {
-      html_url: context.pull_request.html_url
+      html_url: context.payload.pull_request.html_url
     };
     CodeReviewNotification(issues, pull_request);
     // await webhook.send(json);
