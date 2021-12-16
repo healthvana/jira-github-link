@@ -235,8 +235,9 @@ const onPRCreateOrReview = async () => {
       })
     );
     // Send only one notification to Slack with all issues
-    const json = CodeReviewNotification(issues, context);
-    await webhook.send(json);
+    const json = {};
+    //CodeReviewNotification(issues, context);
+    // await webhook.send(json);
     // console.log(json)
   } catch (e) {
     console.log(e);
@@ -244,4 +245,5 @@ const onPRCreateOrReview = async () => {
   // TO DO: transition issue
   //
 };
-onPRCreateOrReview();
+// onPRCreateOrReview();
+getIssueKeysfromBranch();
