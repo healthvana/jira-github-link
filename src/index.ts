@@ -85,7 +85,7 @@ const getIssueKeysfromBranch = async () => {
       owner: { login: owner }
     }
   } = payload;
-  console.log('payload::', payload);
+  // console.log('payload::', payload);
 
   // Get all existing project keys from Jira
   const projectsInfo = await jira.projects.getAllProjects();
