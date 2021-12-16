@@ -146,8 +146,9 @@ const formatCustomFields = (issue) => {
  * @param {Array} keys An array of strings of issue keys
  * @returns {Array} The information from Jira for those issue keys
  */
-const getIssueInfoFromKeys = async (keys: string[] | Error) => {
+const getIssueInfoFromKeys = async (keys: unknown[] | string[] | Error) => {
   if (keys instanceof Error) return;
+  if (!keys.length) return;
   const issuesData = await Promise.all(
     keys.map(async key => {
       let data = null;
