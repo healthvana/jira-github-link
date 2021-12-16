@@ -1,5 +1,5 @@
 import core from '@actions/core';
-import github from '@actions/github';
+import github, { context } from '@actions/github';
 import { IncomingWebhook } from '@slack/webhook';
 import { Version2Client } from 'jira.js';
 import { camelCase } from 'lodash';
@@ -58,8 +58,6 @@ const jira = new Version2Client({
   },
   telemetry: false
 });
-
-const { context } = github;
 
 //Setup Slack Client
 const webhook = new IncomingWebhook(webhookURL);
