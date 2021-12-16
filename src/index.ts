@@ -43,8 +43,8 @@ import users from '../usersMap.json';
 // };
 
 // --- FOR PROD
-const { SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
-const webhookURL = SLACK_WEBHOOK_URL_DEV;
+const { SLACK_WEBHOOK_URL, SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL } = process.env;
+const webhookURL = SLACK_WEBHOOK_URL;
 
 
 // Setup Jira client
