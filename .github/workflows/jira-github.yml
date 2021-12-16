@@ -1,19 +1,9 @@
 name: Jira Github Link
 
-env:
-  JIRA_BASE_URL: ${{ secrets.JIRA_BASE_URL }}
-  JIRA_USER_EMAIL: ${{ secrets.JIRA_USER_EMAIL }}
-  JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  SLACK_WEBHOOK_URL_DEV: ${{ secrets.SLACK_WEBHOOK_URL_DEV }}
-
 on:
     pull_request:
         types:
             [review_requested, review_request_removed, opened, reopened]
-
-    # Allows you to run this workflow manually from the Actions tab
-    workflow_dispatch:
 
 jobs:
     jira-ticket-info:
@@ -27,7 +17,7 @@ jobs:
             - name: Install deps
               shell: bash
               run: npm i
-            - name: Get Issues from Jira
+            - name: Assign Code Reviewer in Jira and notify in Slack
               run: npm run exec
-              id: get_issues
+              id: assign_code_reviewer
 
