@@ -59,7 +59,7 @@ const jira = new Version2Client({
   telemetry: false
 });
 
-const context = github.context;
+const { context } = github;
 
 //Setup Slack Client
 const webhook = new IncomingWebhook(webhookURL);
@@ -74,6 +74,8 @@ const webhook = new IncomingWebhook(webhookURL);
 const getIssueKeysfromBranch = async () => {
   // Get PR info from Github Action context
   const { payload } = context;
+
+  console.log('payload::', payload);
   const {
     pull_request: {
       title,
@@ -85,7 +87,7 @@ const getIssueKeysfromBranch = async () => {
       owner: { login: owner }
     }
   } = payload;
-  console.log('payload::', payload);
+
 
   // Get all existing project keys from Jira
   const projectsInfo = await jira.projects.getAllProjects();
