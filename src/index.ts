@@ -73,7 +73,7 @@ const getIssueKeysfromBranch = async () => {
   // Get PR info from Github Action context
   const { payload } = context;
 
-  console.log('payload::', payload);
+  console.log('context::', JSON.stringify(context, null, 4));
   const {
     pull_request: {
       title,

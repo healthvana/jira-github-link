@@ -22,8 +22,8 @@ interface Issue {
 }
 
 interface Context {
-  payload: {
-    pull_request: {
+  payload?: {
+    pull_request?: {
       html_url?: string;
     }
   }
