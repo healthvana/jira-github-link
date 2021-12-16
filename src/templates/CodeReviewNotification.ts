@@ -21,16 +21,12 @@ interface Issue {
   }
 }
 
-interface Context {
-  payload?: {
-    pull_request?: {
-      html_url?: string;
-    }
-  }
+interface PR {
+  html_url: string;
 }
 
 
-const CodeReviewTemplate = (issues: Issue[], context: Context) => {
+const CodeReviewTemplate = (issues: Issue[], pr: PR) => {
   const issuesBlock = issues.map(issue => {
     return [
       {
@@ -118,14 +114,14 @@ const CodeReviewTemplate = (issues: Issue[], context: Context) => {
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: `*Pull Request:* PR`,
+      text: `*Pull Request:* <${pr.html_url}>`,
     },
   },
   {
     "type": "divider"
   }
   ];
-  //context.payload.pull_request.html_url
+
   const blocks = [...jiraHeader, ...flatten(issuesBlock), ...github];
 
   // console.log(JSON.stringify(blocks, null, 4));
