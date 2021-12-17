@@ -23,8 +23,8 @@ interface Issue {
 
 interface Context {
   payload: {
-    pull_request: {
-      url: string;
+    pull_request?: {
+      html_url?: string;
     }
   }
 }
@@ -118,7 +118,7 @@ const CodeReviewTemplate = (issues: Issue[], context: Context) => {
     type: 'section',
     text: {
       type: 'mrkdwn',
-      text: `*Pull Request:* <${context.payload.pull_request.url}| ${context.payload.pull_request.url} >`,
+      text: `*Pull Request:* <${context.payload.pull_request.html_url}| ${context.payload.pull_request.html_url} >`,
     },
   },
   {

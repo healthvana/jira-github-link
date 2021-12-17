@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
-    "outDir": "dest",
-    "target": "es2015",
-    "module": "commonjs",
+    "allowSyntheticDefaultImports": true,
+    "outDir": "./dest/*.js",
+    "target": "es2017",
+    "module": "es2022",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true
-  }
+  },
+  "include": ["./src/*.ts"]
 }

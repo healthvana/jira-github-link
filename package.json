@@ -21,7 +21,8 @@
   "name": "jira-github-link",
   "scripts": {
     "exec": "node --loader ts-node/esm ./src/index.ts",
-    "build": "tsc src/*.ts"
+    "build": "tsc -p ./",
+    "watch": "tsc -p ./ --watch"
   },
-  "version": "1.0.0"
+  "version": "1.0.10"
 }

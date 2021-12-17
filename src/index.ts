@@ -73,12 +73,7 @@ const getIssueKeysfromBranch = async () => {
   // If none, throw; label PR
   if (!branchMatches?.length && !titleMatches?.length) {
     try {
-      github.issues.addLabels({
-        owner,
-        repo,
-        issue_number,
-        label: [{ name: 'NO JIRA TICKET' }]
-      });
+      console.log("no ticket")
     } catch (e) {
       return new Error(
         `No issue keys found in branch name "${branch} and unable to label PR."`
@@ -121,7 +116,7 @@ const formatCustomFields = (issue) => {
  * @param {Array} keys An array of strings of issue keys
  * @returns {Array} The information from Jira for those issue keys
  */
-const getIssueInfoFromKeys = async (keys: string[] | Error) => {
+const getIssueInfoFromKeys = async (keys: unknown[] | string[] | Error) => {
   if (keys instanceof Error) return;
   const issuesData = await Promise.all(
     keys.map(async key => {
