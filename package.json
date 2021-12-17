@@ -1,27 +1,30 @@
 {
-  "author": "",
+  "author": "healthvana",
   "dependencies": {
     "@actions/core": "^1.6.0",
     "@actions/github": "^5.0.0",
     "@slack/webhook": "^6.0.0",
+    "jira.js": "^2.8.0",
+    "lodash": "^4.17.21"
+  },
+  "description": "",
+  "devDependencies": {
     "@types/lodash": "^4.14.178",
     "@types/node": "^16.11.13",
     "@typescript-eslint/eslint-plugin": "^5.7.0",
     "@typescript-eslint/parser": "^5.7.0",
-    "jira.js": "^2.8.0",
-    "lodash": "^4.17.21",
     "octokit": "^1.7.1",
     "ts-node": "^10.4.0",
     "tslib": "^2.3.1",
     "typescript": "^4.5.4"
   },
-  "description": "",
   "license": "ISC",
-  "main": "index.js",
+  "main": "./dest/index.js",
   "name": "jira-github-link",
   "scripts": {
-    "exec": "node --loader ts-node/esm ./src/index.ts",
     "build": "tsc -p ./",
+    "dev": "node --loader ts-node/esm ./src/index.ts",
+    "exec": "node ./dest/index.js",
     "watch": "tsc -p ./ --watch"
   },
   "version": "1.0.10"

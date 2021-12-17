@@ -28,7 +28,6 @@ runs:
     - uses: actions/setup-node@v2
       with:
         node-version: '16'
-    # - uses: actions/cache@v2.1.7
     - name: Install deps
       run: cd $GITHUB_ACTION_PATH; npm i
       shell: bash
