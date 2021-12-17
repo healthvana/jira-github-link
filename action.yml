@@ -1,6 +1,28 @@
 name: 'Jira-Github-Slack Link'
 description: 'Links up Jira, Github and Slack'
 author: 'Healthvana'
+
+inputs:
+  JIRA_BASE_URL:
+    description: 'Base url of your Jira installation, e.g. https://yourorg.atlassian.net/'
+    required: true
+  JIRA_API_TOKEN:
+    description: 'API token for Jira REST API'
+    required: true
+  JIRA_USER_EMAIL:
+    description: 'Email of the user the Jira API token belongs to.'
+    required: true
+  SLACK_WEBHOOK_URL:
+    description: 'Webhook configured for the slack channel you actually want to use'
+    required: true
+  SLACK_WEBHOOK_URL_DEV:
+    description: 'Webhook configured for the slack channel you want to develop against; maybe your DMs'
+    required: true
+  USERS_PATH:
+    description: 'path to a formatted JSON file of user information for Slack and Jira'
+    required: true
+  
+
 runs:
   using: 'composite'
   steps:
@@ -12,12 +34,6 @@ runs:
       run: npm i
     - name: Assign Code Reviewer in Jira and notify in Slack
       run: npm run exec
-      with:
-        JIRA_API_TOKEN: "${{ secrets.JIRA_API_TOKEN }}"
-        JIRA_BASE_URL: "${{ secrets.JIRA_BASE_URL }}"
-        JIRA_USER_EMAIL: "${{ secrets.JIRA_USER_EMAIL }}"
-        SLACK_WEBHOOK_URL: "${{ secrets.SLACK_WEBHOOK_URL }}"
-        SLACK_WEBHOOK_URL_DEV: "${{ secrets.SLACK_WEBHOOK_URL_DEV }}"
       shell: bash
 branding:
   color: red

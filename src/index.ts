@@ -7,9 +7,16 @@ import { camelCase } from 'lodash';
 import CodeReviewNotification from './templates/CodeReviewNotification';
 
 // --- FOR PROD
-const { SLACK_WEBHOOK_URL, SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL, USERS_PATH } = process.env;
+const {
+  INPUT_SLACK_WEBHOOK_URL: SLACK_WEBHOOK_URL,
+  INPUT_SLACK_WEBHOOK_URL_DEV: SLACK_WEBHOOK_URL_DEV,
+  INPUT_JIRA_API_TOKEN: JIRA_API_TOKEN,
+  INPUT_JIRA_USER_EMAIL: JIRA_USER_EMAIL,
+  INPUT_JIRA_BASE_URL: JIRA_BASE_URL,
+  INPUT_USERS_PATH: USERS_PATH
+} = process.env;
 
-const users = import(USERS_PATH);
+const users = await import(USERS_PATH);
 
 const webhookURL = SLACK_WEBHOOK_URL;
 
