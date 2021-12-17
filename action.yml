@@ -2,5 +2,7 @@ name: 'Jira-Github-Slack Link'
 description: 'Links up Jira, Github and Slack'
 author: 'Healthvana'
 runs:
-  using: 'node16'
-  main: './src/index.ts'
+  using: 'composite'
+  steps:
+    - run: ./.github/actions/jira-github.yml
+      shell: bash
