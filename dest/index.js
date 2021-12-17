@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
-const github_1 = (0, tslib_1.__importDefault)(require("@actions/github"));
+const github_1 = require("@actions/github");
 const webhook_1 = require("@slack/webhook");
 const jira_js_1 = require("jira.js");
 const lodash_1 = require("lodash");
@@ -24,7 +24,7 @@ const jira = new jira_js_1.Version2Client({
     },
     telemetry: false
 });
-const context = github_1.default.context;
+// const context = github.context;
 //Setup Slack Client
 const webhook = new webhook_1.IncomingWebhook(webhookURL);
 // ----------WORKFLOW
@@ -36,7 +36,7 @@ const webhook = new webhook_1.IncomingWebhook(webhookURL);
  */
 const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
     // Get PR info from Github Action context
-    const { payload } = context;
+    const { payload } = github_1.context;
     const { pull_request: { title, head: { ref: branch } }, number: issue_number, repository: { name: repo, owner: { login: owner } } } = payload;
     console.log('payload::', payload);
     // Get all existing project keys from Jira
@@ -113,7 +113,7 @@ const getIssueInfoFromKeys = (keys) => (0, tslib_1.__awaiter)(void 0, void 0, vo
  * @param {Object} issueInfo
  */
 const getReviewersInfo = () => {
-    const { payload: { requested_reviewers } } = context;
+    const { payload: { requested_reviewers } } = github_1.context;
     // find the user in the map
     return requested_reviewers.map(({ login }) => {
         return users.find(user => user.github.account === login);
@@ -156,7 +156,7 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
             return yield jira.issues.editIssue(finalRequestBody);
         })));
         // Send only one notification to Slack with all issues
-        const json = (0, CodeReviewNotification_1.default)(issues, context);
+        const json = (0, CodeReviewNotification_1.default)(issues, github_1.context);
         yield webhook.send(json);
         // console.log(json)
     }

@@ -1,5 +1,5 @@
 import core from '@actions/core';
-import github from '@actions/github';
+import { context } from '@actions/github';
 import { IncomingWebhook } from '@slack/webhook';
 import { Version2Client } from 'jira.js';
 import { camelCase } from 'lodash';
@@ -16,6 +16,7 @@ const {
   INPUT_USERS_PATH: USERS_PATH
 } = process.env;
 
+console.log({ SLACK_WEBHOOK_URL, SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL, USERS_PATH })
 
 let users = [];
 const getUsersFromFile = async () => {
@@ -23,7 +24,7 @@ const getUsersFromFile = async () => {
 }
 
 
-const webhookURL = SLACK_WEBHOOK_URL;
+const webhookURL = SLACK_WEBHOOK_URL_DEV;
 
 // Setup Jira client
 const jira = new Version2Client({
@@ -37,7 +38,7 @@ const jira = new Version2Client({
   telemetry: false
 });
 
-const context = github.context;
+// const context = github.context;
 
 //Setup Slack Client
 const webhook = new IncomingWebhook(webhookURL);
