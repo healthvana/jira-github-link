@@ -33,7 +33,7 @@ runs:
       run: cd $GITHUB_ACTION_PATH; npm i
       shell: bash
     - name: Assign Code Reviewer in Jira and notify in Slack
-      run: npm run exec
+      run: cd $GITHUB_ACTION_PATH; npm run exec
       shell: bash
 branding:
   color: red
