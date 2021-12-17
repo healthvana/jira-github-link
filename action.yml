@@ -21,7 +21,6 @@ inputs:
   USERS_PATH:
     description: 'path to a formatted JSON file of user information for Slack and Jira'
     required: true
-  
 
 runs:
   using: 'composite'
@@ -29,9 +28,10 @@ runs:
     - uses: actions/setup-node@v2
       with:
         node-version: '16'
+    - uses: actions/cache@v2.1.7
     - name: Install deps
+      run: cd $GITHUB_ACTION_PATH; npm i
       shell: bash
-      run: npm i
     - name: Assign Code Reviewer in Jira and notify in Slack
       run: npm run exec
       shell: bash
