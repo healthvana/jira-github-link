@@ -4,8 +4,16 @@ author: 'Healthvana'
 runs:
   using: 'composite'
   steps:
-    - run: ${{ github.action_path }}/jira-github.yml
-    - shell: bash
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+    - name: Install deps
+      shell: bash
+      run: npm i
+    - name: Assign Code Reviewer in Jira and notify in Slack
+      run: npm run exec
+      shell: bash
 branding:
   color: red
   icon: bell
