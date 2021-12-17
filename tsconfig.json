@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
-    "outDir": "./dest/*.js",
+    "outDir": "./dest/",
     "target": "es2017",
     "module": "es2022",
     "moduleResolution": "node",
