@@ -1,4 +1,6 @@
-import { truncate, flatten, escape } from 'lodash';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const lodash_1 = require("lodash");
 const CodeReviewTemplate = (issues, context) => {
     const issuesBlock = issues.map(issue => {
         return [
@@ -22,7 +24,7 @@ const CodeReviewTemplate = (issues, context) => {
                     },
                     {
                         type: 'mrkdwn',
-                        text: `*Description:* \n\`\`\`\`${escape(truncate(issue.fields.description, { length: 200 }))}\`\`\`\``
+                        text: `*Description:* \n\`\`\`\`${(0, lodash_1.escape)((0, lodash_1.truncate)(issue.fields.description, { length: 200 }))}\`\`\`\``
                     }
                 ]
             },
@@ -94,10 +96,10 @@ const CodeReviewTemplate = (issues, context) => {
             "type": "divider"
         }
     ];
-    const blocks = [...jiraHeader, ...flatten(issuesBlock), ...github];
+    const blocks = [...jiraHeader, ...(0, lodash_1.flatten)(issuesBlock), ...github];
     // console.log(JSON.stringify(blocks, null, 4));
     return {
         blocks
     };
 };
-export default CodeReviewTemplate;
+exports.default = CodeReviewTemplate;

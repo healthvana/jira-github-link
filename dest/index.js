@@ -1,14 +1,20 @@
-import github from '@actions/github';
-import { IncomingWebhook } from '@slack/webhook';
-import { Version2Client } from 'jira.js';
-import { camelCase } from 'lodash';
-import CodeReviewNotification from './templates/CodeReviewNotification';
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = require("tslib");
+const github_1 = (0, tslib_1.__importDefault)(require("@actions/github"));
+const webhook_1 = require("@slack/webhook");
+const jira_js_1 = require("jira.js");
+const lodash_1 = require("lodash");
+const CodeReviewNotification_1 = (0, tslib_1.__importDefault)(require("./templates/CodeReviewNotification"));
 // --- FOR PROD
 const { INPUT_SLACK_WEBHOOK_URL: SLACK_WEBHOOK_URL, INPUT_SLACK_WEBHOOK_URL_DEV: SLACK_WEBHOOK_URL_DEV, INPUT_JIRA_API_TOKEN: JIRA_API_TOKEN, INPUT_JIRA_USER_EMAIL: JIRA_USER_EMAIL, INPUT_JIRA_BASE_URL: JIRA_BASE_URL, INPUT_USERS_PATH: USERS_PATH } = process.env;
-const users = await import(USERS_PATH);
+let users = [];
+const getUsersFromFile = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
+    users = yield Promise.resolve().then(() => (0, tslib_1.__importStar)(require(USERS_PATH)));
+});
 const webhookURL = SLACK_WEBHOOK_URL;
 // Setup Jira client
-const jira = new Version2Client({
+const jira = new jira_js_1.Version2Client({
     host: JIRA_BASE_URL,
     authentication: {
         basic: {
@@ -18,9 +24,9 @@ const jira = new Version2Client({
     },
     telemetry: false
 });
-const context = github.context;
+const context = github_1.default.context;
 //Setup Slack Client
-const webhook = new IncomingWebhook(webhookURL);
+const webhook = new webhook_1.IncomingWebhook(webhookURL);
 // ----------WORKFLOW
 /**
  * Uses the context from a github action to take
@@ -28,13 +34,13 @@ const webhook = new IncomingWebhook(webhookURL);
  * all Jira Project keys.
  * @returns {array} Array of unique issue keys
  */
-const getIssueKeysfromBranch = async () => {
+const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
     // Get PR info from Github Action context
     const { payload } = context;
     const { pull_request: { title, head: { ref: branch } }, number: issue_number, repository: { name: repo, owner: { login: owner } } } = payload;
     console.log('payload::', payload);
     // Get all existing project keys from Jira
-    const projectsInfo = await jira.projects.getAllProjects();
+    const projectsInfo = yield jira.projects.getAllProjects();
     const projects = projectsInfo.map(prj => prj.key);
     // Look for possible keys using this regex
     const projectsRegex = `((${projects.join('|')})-\\d{1,})`;
@@ -52,7 +58,7 @@ const getIssueKeysfromBranch = async () => {
         return new Error(`No issue keys found in branch name "${branch}"; PR label added.`);
     }
     return [...new Set(branchMatches.concat(titleMatches))];
-};
+});
 /**
  * Mutates and transforms the standard Jira issue JSON format for easier use in templating
  * @param {Object} issue An issue from Jira
@@ -66,7 +72,7 @@ const formatCustomFields = (issue) => {
         return jiraName.includes('custom');
     })
         .forEach(jiraName => {
-        const formattedKey = camelCase(customFields[jiraName]);
+        const formattedKey = (0, lodash_1.camelCase)(customFields[jiraName]);
         const value = issue.fields[jiraName];
         fieldMap[formattedKey] = jiraName;
         issue.fields[formattedKey] = value;
@@ -81,13 +87,13 @@ const formatCustomFields = (issue) => {
  * @param {Array} keys An array of strings of issue keys
  * @returns {Array} The information from Jira for those issue keys
  */
-const getIssueInfoFromKeys = async (keys) => {
+const getIssueInfoFromKeys = (keys) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
     if (keys instanceof Error)
         return;
-    const issuesData = await Promise.all(keys.map(async (key) => {
+    const issuesData = yield Promise.all(keys.map((key) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
         let data = null;
         try {
-            data = await jira.issues.getIssue({
+            data = yield jira.issues.getIssue({
                 issueIdOrKey: key,
                 expand: 'names'
             });
@@ -97,11 +103,11 @@ const getIssueInfoFromKeys = async (keys) => {
             return new Error(e);
         }
         return data;
-    }));
+    })));
     // TO DO: Fetch Epic issue info as well, and append to issue as `issue.epic`
     const formattedissues = issuesData.map(formatCustomFields);
     return formattedissues;
-};
+});
 /**
  *
  * @param {Object} issueInfo
@@ -113,16 +119,16 @@ const getReviewersInfo = () => {
         return users.find(user => user.github.account === login);
     });
 };
-const onPRCreateOrReview = async () => {
+const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
     // Get the issue keys from the PR title and branch name
-    const keys = await getIssueKeysfromBranch();
+    const keys = yield getIssueKeysfromBranch();
     // Get the info from Jira for those issue keys
     let issues = [];
     if (keys instanceof Error) {
         return keys;
     }
     try {
-        issues = await getIssueInfoFromKeys(keys);
+        issues = yield getIssueInfoFromKeys(keys);
     }
     catch (e) {
         return new Error('Unable to return issue info');
@@ -141,17 +147,17 @@ const onPRCreateOrReview = async () => {
     };
     let reviwerAssignResponse;
     try {
-        reviwerAssignResponse = await Promise.all(issues.map(async (issue) => {
+        reviwerAssignResponse = yield Promise.all(issues.map((issue) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
             issue.reviewersInSlack = reviewersInSlack;
             issue.epicURL = `${JIRA_BASE_URL}browse/${issue.fields.epicLink}`;
             issue.browseURL = `${JIRA_BASE_URL}browse/${issue.key}`;
             const finalRequestBody = Object.assign({ issueIdOrKey: issue.key }, requestBodyBase);
             // assign to Code Reviewer in Jira
-            return await jira.issues.editIssue(finalRequestBody);
-        }));
+            return yield jira.issues.editIssue(finalRequestBody);
+        })));
         // Send only one notification to Slack with all issues
-        const json = CodeReviewNotification(issues, context);
-        await webhook.send(json);
+        const json = (0, CodeReviewNotification_1.default)(issues, context);
+        yield webhook.send(json);
         // console.log(json)
     }
     catch (e) {
@@ -159,5 +165,6 @@ const onPRCreateOrReview = async () => {
     }
     // TO DO: transition issue
     //
-};
+});
+getUsersFromFile();
 onPRCreateOrReview();

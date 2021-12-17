@@ -16,7 +16,12 @@ const {
   INPUT_USERS_PATH: USERS_PATH
 } = process.env;
 
-const users = await import(USERS_PATH);
+
+let users = [];
+const getUsersFromFile = async () => {
+  users = await import(USERS_PATH);
+}
+
 
 const webhookURL = SLACK_WEBHOOK_URL;
 
@@ -213,4 +218,5 @@ const onPRCreateOrReview = async () => {
   // TO DO: transition issue
   //
 };
+getUsersFromFile();
 onPRCreateOrReview();

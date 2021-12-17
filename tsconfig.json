@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
+    "importHelpers": true,
     "outDir": "./dest/",
-    "target": "es2017",
-    "module": "es2022",
+    "target": "es6",
+    "module": "commonjs",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": true,
