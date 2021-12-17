@@ -20,7 +20,8 @@
   "main": "index.js",
   "name": "jira-github-link",
   "scripts": {
-    "exec": "node --loader ts-node/esm ./src/index.ts"
+    "exec": "node --loader ts-node/esm ./src/index.ts",
+    "build": "tsc src/*.ts"
   },
   "version": "1.0.0"
 }
