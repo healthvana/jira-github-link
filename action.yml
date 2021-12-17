@@ -1,0 +1,6 @@
+name: 'Jira-Github-Slack Link'
+description: 'Links up Jira, Github and Slack'
+author: 'Healthvana'
+runs:
+  using: 'node16'
+  main: './src/index.js'
