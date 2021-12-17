@@ -4,5 +4,8 @@ author: 'Healthvana'
 runs:
   using: 'composite'
   steps:
-    - run: ./.github/actions/jira-github.yml
-      shell: bash
+    - run: ${{ github.action_path }}/jira-github.yml
+    - shell: bash
+branding:
+  color: red
+  icon: bell
