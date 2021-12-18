@@ -14,7 +14,6 @@
     "@typescript-eslint/eslint-plugin": "^5.7.0",
     "@typescript-eslint/parser": "^5.7.0",
     "dotenv": "^10.0.0",
-    "octokit": "^1.7.1",
     "ts-node": "^10.4.0",
     "tslib": "^2.3.1",
     "typescript": "^4.5.4"
@@ -29,5 +28,5 @@
     "exec": "node ./dest/index.js",
     "watch": "tsc -p ./ --watch"
   },
-  "version": "1.0.28"
+  "version": "1.0.29"
 }

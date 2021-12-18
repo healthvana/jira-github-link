@@ -26,7 +26,7 @@ const {
 const h = resolve(GITHUB_WORKSPACE, USERS_PATH);
 let users = [];
 const getUsersFromFile = async () => {
-  users = await import(h);
+  return await import(h);
 }
 
 // Easily swap whether we're posting to Slack in "dev" (DMs)
@@ -63,16 +63,21 @@ const getIssueKeysfromBranch = async () => {
   // Get PR info from Github Action context
   const { payload } = context;
   const {
-    pull_request: {
-      title,
-      head: { ref: branch }
-    },
+    pull_request,
     number: issue_number,
     repository: {
       name: repo,
       owner: { login: owner }
     }
   } = payload;
+
+  if (!pull_request) {
+    console.error("Seems like there's no pull_request attached to the Github context; are you sure you're hooked up to the right event type?")
+  }
+  const {
+    title,
+    head: { ref: branch }
+  } = pull_request;
 
   // Get all existing project keys from Jira
   const projectsInfo = await jira.projects.getAllProjects();
@@ -88,7 +93,7 @@ const getIssueKeysfromBranch = async () => {
   if (!branchMatches?.length && !titleMatches?.length) {
     try {
       // TODO: Add a label to issue that there's no Jira ticket
-      console.log("no ticket")
+      console.error("no ticket")
     } catch (e) {
       return new Error(
         `No issue keys found in branch name "${branch} and unable to label PR."`
@@ -159,20 +164,22 @@ const getIssueInfoFromKeys = async (keys: unknown[] | string[] | Error) => {
  * Get the github login from the PR that triggered the action
  * and get that person's information on all three systems
  * (Slack, Jira, Github)
+ * @param {Array} users Dynamically fetched user map
  * @returns {Object} A map of the reviewers information
  */
-const getReviewersInfo = () => {
+const getReviewersInfo = (users) => {
   const {
     payload: { requested_reviewers }
   } = context;
   if (!requested_reviewers) return [];
   // find the user in the map
   return requested_reviewers.map(({ login }) => {
+    console.log('requested reviewers::', login)
     return users.find(user => user.github.account === login);
   });
 };
 
-const onPRCreateOrReview = async () => {
+const onPRCreateOrReview = async (users) => {
   // Get the issue keys from the PR title and branch name
   const keys = await getIssueKeysfromBranch();
 
@@ -188,7 +195,7 @@ const onPRCreateOrReview = async () => {
   }
 
   // Get the reviewer's info from the usersmap
-  const reviewersInfo = getReviewersInfo();
+  const reviewersInfo = getReviewersInfo(users);
   const reviewersInJira = reviewersInfo.map(r => {
     return { accountId: r.jira.accountId };
   });
@@ -219,20 +226,25 @@ const onPRCreateOrReview = async () => {
       })
     );
   } catch (e) {
-    console.log(`Updating Jira tickets ${keysForLogging} failed:`);
-    console.log(e);
+    console.error(`Updating Jira tickets ${keysForLogging} failed:`);
+    return new Error(e);
   }
   try {
+    // Only send notificaton if they are people to notify
+    if (!reviewersInfo.length) return;
+
     // Send only one notification to Slack with all issues
     const json = CodeReviewNotification(issues, context);
     await webhook.send(json);
-    console.log('Slack notification json::', json);
+    console.log('Slack notification json::', JSON.stringify(json, null, 4));
   } catch (e) {
-    console.log(`Sending Slack notification for ticket ${keysForLogging} failed:`);
-    console.log(e);
+    console.error(`Sending Slack notification for ticket ${keysForLogging} failed:`);
+    return new Error(e);
   }
   // TODO: transition issue
 };
 
-getUsersFromFile();
-onPRCreateOrReview();
+getUsersFromFile().then(users => {
+  onPRCreateOrReview(users);
+});
+
