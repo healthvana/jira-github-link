@@ -7,12 +7,13 @@ const jira_js_1 = require("jira.js");
 const lodash_1 = require("lodash");
 const CodeReviewNotification_1 = (0, tslib_1.__importDefault)(require("./templates/CodeReviewNotification"));
 // --- FOR PROD
-const { INPUT_SLACK_WEBHOOK_URL: SLACK_WEBHOOK_URL, INPUT_SLACK_WEBHOOK_URL_DEV: SLACK_WEBHOOK_URL_DEV, INPUT_JIRA_API_TOKEN: JIRA_API_TOKEN, INPUT_JIRA_USER_EMAIL: JIRA_USER_EMAIL, INPUT_JIRA_BASE_URL: JIRA_BASE_URL, INPUT_USERS_PATH: USERS_PATH } = process.env;
+const { SLACK_WEBHOOK_URL, SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL, USERS_PATH } = process.env;
+console.log("process.env::", process.env);
 let users = [];
 const getUsersFromFile = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
     users = yield Promise.resolve().then(() => (0, tslib_1.__importStar)(require(USERS_PATH)));
 });
-const webhookURL = SLACK_WEBHOOK_URL;
+const webhookURL = SLACK_WEBHOOK_URL_DEV;
 // Setup Jira client
 const jira = new jira_js_1.Version2Client({
     host: JIRA_BASE_URL,

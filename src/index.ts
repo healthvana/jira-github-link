@@ -8,21 +8,20 @@ import CodeReviewNotification from './templates/CodeReviewNotification';
 
 // --- FOR PROD
 const {
-  INPUT_SLACK_WEBHOOK_URL: SLACK_WEBHOOK_URL,
-  INPUT_SLACK_WEBHOOK_URL_DEV: SLACK_WEBHOOK_URL_DEV,
-  INPUT_JIRA_API_TOKEN: JIRA_API_TOKEN,
-  INPUT_JIRA_USER_EMAIL: JIRA_USER_EMAIL,
-  INPUT_JIRA_BASE_URL: JIRA_BASE_URL,
-  INPUT_USERS_PATH: USERS_PATH
+  SLACK_WEBHOOK_URL,
+  SLACK_WEBHOOK_URL_DEV,
+  JIRA_API_TOKEN,
+  JIRA_USER_EMAIL,
+  JIRA_BASE_URL,
+  USERS_PATH
 } = process.env;
 
-console.log({ SLACK_WEBHOOK_URL, SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL, USERS_PATH })
+console.log("process.env::", process.env)
 
 let users = [];
 const getUsersFromFile = async () => {
   users = await import(USERS_PATH);
 }
-
 
 const webhookURL = SLACK_WEBHOOK_URL_DEV;
 
