@@ -196,8 +196,8 @@ const onPRCreateOrReview = (users) => (0, tslib_1.__awaiter)(void 0, void 0, voi
 getUsersFromFile().catch(e => {
     console.error("Couldnt get users from file.");
     throw new Error(e);
-}).then(module => {
+}).then((module) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
     const users = module.default;
     console.log('USERS::', JSON.stringify(users, null, 4));
-    onPRCreateOrReview(users);
-});
+    yield onPRCreateOrReview(users);
+}));

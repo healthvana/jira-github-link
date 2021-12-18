@@ -247,9 +247,9 @@ const onPRCreateOrReview = async (users) => {
 getUsersFromFile().catch(e => {
   console.error("Couldnt get users from file.");
   throw new Error(e)
-}).then(module => {
+}).then(async module => {
   const users = module.default;
   console.log('USERS::', JSON.stringify(users, null, 4));
-  onPRCreateOrReview(users);
+  await onPRCreateOrReview(users);
 });
 

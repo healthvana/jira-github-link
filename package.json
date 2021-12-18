@@ -28,5 +28,5 @@
     "exec": "node ./dest/index.js",
     "watch": "tsc -p ./ --watch"
   },
-  "version": "1.0.30"
+  "version": "1.0.31"
 }
