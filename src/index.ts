@@ -22,14 +22,6 @@ const {
   USERS
 } = process.env;
 
-// Have to dynamically import the users map
-// based on the path provided by the caller Workflow
-
-const getUsersFromFile = async () => {
-  const h = resolve(GITHUB_WORKSPACE, USERS_PATH);
-  return await import(h);
-}
-
 // Easily swap whether we're posting to Slack in "dev" (DMs)
 // or "prod" (the actual channel we want to post to)
 const webhookURL = SLACK_WEBHOOK_URL_DEV;
@@ -253,16 +245,4 @@ const onPRCreateOrReview = async () => {
   return slackResponse;
 };
 
-
-
-switch (process.argv[2]) {
-  case 'users':
-    getUsersFromFile().then(async module => {
-      const users = module.default;
-      core.exportVariable('USERS', JSON.stringify(users));
-    });
-    break;
-  default:
-    onPRCreateOrReview();
-    break;
-}
+onPRCreateOrReview();

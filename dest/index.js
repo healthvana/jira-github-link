@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
-const path_1 = require("path");
 const core = (0, tslib_1.__importStar)(require("@actions/core"));
 const github_1 = require("@actions/github");
 const webhook_1 = require("@slack/webhook");
@@ -12,12 +11,6 @@ const CodeReviewNotification_1 = (0, tslib_1.__importDefault)(require("./templat
 // Environment variables. Uses Github's provided variables in Prod
 // and a dotenv file locally for development.
 const { SLACK_WEBHOOK_URL, SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL, USERS_PATH, GITHUB_WORKSPACE, USERS } = process.env;
-// Have to dynamically import the users map
-// based on the path provided by the caller Workflow
-const getUsersFromFile = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
-    const h = (0, path_1.resolve)(GITHUB_WORKSPACE, USERS_PATH);
-    return yield Promise.resolve().then(() => (0, tslib_1.__importStar)(require(h)));
-});
 // Easily swap whether we're posting to Slack in "dev" (DMs)
 // or "prod" (the actual channel we want to post to)
 const webhookURL = SLACK_WEBHOOK_URL_DEV;
@@ -201,14 +194,4 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
     // TODO: transition issue
     return slackResponse;
 });
-switch (process.argv[2]) {
-    case 'users':
-        getUsersFromFile().then((module) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
-            const users = module.default;
-            core.exportVariable('USERS', JSON.stringify(users));
-        }));
-        break;
-    default:
-        onPRCreateOrReview();
-        break;
-}
+onPRCreateOrReview();
