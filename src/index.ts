@@ -239,8 +239,8 @@ const onPRCreateOrReview = async () => {
     await Promise.all(
       issues.map(async issue => {
         issue.reviewersInSlack = reviewersInSlack;
-        issue.epicURL = `${JIRA_BASE_URL}browse/${issue.fields.epicLink}`;
-        issue.browseURL = `${JIRA_BASE_URL}browse/${issue.key}`;
+        issue.epicURL = `${JIRA_BASE_URL}/browse/${issue.fields.epicLink}`;
+        issue.browseURL = `${JIRA_BASE_URL}/browse/${issue.key}`;
 
         const finalRequestBody = {
           issueIdOrKey: issue.key,

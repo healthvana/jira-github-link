@@ -186,8 +186,8 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
     try {
         yield Promise.all(issues.map((issue) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
             issue.reviewersInSlack = reviewersInSlack;
-            issue.epicURL = `${JIRA_BASE_URL}browse/${issue.fields.epicLink}`;
-            issue.browseURL = `${JIRA_BASE_URL}browse/${issue.key}`;
+            issue.epicURL = `${JIRA_BASE_URL}/browse/${issue.fields.epicLink}`;
+            issue.browseURL = `${JIRA_BASE_URL}/browse/${issue.key}`;
             const finalRequestBody = Object.assign({ issueIdOrKey: issue.key }, requestBodyBase);
             // assign to Code Reviewer in Jira
             const jiraEditResp = yield jira.issues.editIssue(finalRequestBody);
