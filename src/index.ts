@@ -21,13 +21,6 @@ const {
 
 const h = resolve(GITHUB_WORKSPACE, USERS_PATH);
 
-fs.readdir(dirname(h), (err, files) => {
-  console.log(`files in ${dirname(h)}::`)
-  files.forEach(file => {
-    console.log(file);
-  });
-});
-
 let users = [];
 const getUsersFromFile = async () => {
   users = await import(h);
@@ -156,7 +149,6 @@ const getIssueInfoFromKeys = async (keys: unknown[] | string[] | Error) => {
 };
 
 
-
 /**
  *
  * @param {Object} issueInfo
@@ -228,5 +220,5 @@ const onPRCreateOrReview = async () => {
   // TO DO: transition issue
   //
 };
-// getUsersFromFile();
+getUsersFromFile();
 // onPRCreateOrReview();

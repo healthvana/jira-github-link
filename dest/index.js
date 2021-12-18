@@ -2,7 +2,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
 const path_1 = require("path");
-const fs_1 = (0, tslib_1.__importDefault)(require("fs"));
 const github_1 = require("@actions/github");
 const webhook_1 = require("@slack/webhook");
 const jira_js_1 = require("jira.js");
@@ -11,12 +10,6 @@ const CodeReviewNotification_1 = (0, tslib_1.__importDefault)(require("./templat
 // --- FOR PROD
 const { SLACK_WEBHOOK_URL, SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL, USERS_PATH, GITHUB_WORKSPACE } = process.env;
 const h = (0, path_1.resolve)(GITHUB_WORKSPACE, USERS_PATH);
-fs_1.default.readdir((0, path_1.dirname)(h), (err, files) => {
-    console.log(`files in ${(0, path_1.dirname)(h)}::`);
-    files.forEach(file => {
-        console.log(file);
-    });
-});
 let users = [];
 const getUsersFromFile = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
     users = yield Promise.resolve().then(() => (0, tslib_1.__importStar)(require(h)));
@@ -177,5 +170,5 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
     // TO DO: transition issue
     //
 });
-// getUsersFromFile();
+getUsersFromFile();
 // onPRCreateOrReview();
