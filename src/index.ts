@@ -18,7 +18,7 @@ const {
   GITHUB_WORKSPACE
 } = process.env;
 
-console.log("process.env::", process.env)
+console.log("process.cwd()::", process.cwd())
 
 let users = [];
 const getUsersFromFile = async () => {
