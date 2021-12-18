@@ -56,7 +56,7 @@ const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void
     if (!(branchMatches === null || branchMatches === void 0 ? void 0 : branchMatches.length) && !(titleMatches === null || titleMatches === void 0 ? void 0 : titleMatches.length)) {
         try {
             // TODO: Add a label to issue that there's no Jira ticket
-            console.error("no ticket");
+            console.error('no ticket');
         }
         catch (e) {
             return new Error(`No issue keys found in branch name "${branch} and unable to label PR."`);
@@ -71,7 +71,8 @@ const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void
  * @param {Object} issue An issue from Jira
  * @returns {Object} The issue with custom fields translated to plain text
  */
-const formatCustomFields = (issue) => {
+const formatCustomFields = issue => {
+    core.startGroup('Formatting issue fields');
     const { names: customFields } = issue;
     let fieldMap = {};
     Object.keys(customFields)
@@ -87,6 +88,9 @@ const formatCustomFields = (issue) => {
     });
     // replace the old names area with the new map
     issue.names = fieldMap;
+    core.debug(`Issue${issue.key}Formatted::`);
+    core.debug(issue);
+    core.endGroup();
     return issue;
 };
 /**
@@ -137,12 +141,14 @@ const getReviewersInfo = () => {
     core.endGroup();
 };
 const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
+    core.startGroup('Start `onPRCreateorReview`');
     // Get the issue keys from the PR title and branch name
     const keys = yield getIssueKeysfromBranch();
     // Get the info from Jira for those issue keys
     let issues = [];
     if (keys instanceof Error) {
         return keys;
+        core.setFailed('Invalue issue keys.');
     }
     try {
         issues = yield getIssueInfoFromKeys(keys);
@@ -152,6 +158,8 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
     }
     // Get the reviewer's info from the usersmap
     const reviewersInfo = getReviewersInfo();
+    core.debug('reviewersInfo::');
+    core.debug(reviewersInfo);
     const reviewersInJira = reviewersInfo.map(r => {
         return { accountId: r.jira.accountId };
     });
@@ -159,10 +167,13 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
     let reviewersInSlack = reviewersSlackList.join(', ');
     const requestBodyBase = {
         fields: {
-            [issues[0].names["codeReviewerS"]]: reviewersInJira
+            [issues[0].names['codeReviewerS']]: reviewersInJira
         }
     };
-    const keysForLogging = issues.map(i => i.key).join();
+    core.info('Jira requestBodyBase::');
+    core.info(JSON.stringify(requestBodyBase, null, 4) || '');
+    core.setOutput('issueKeys', issues);
+    const keysForLogging = keys.join();
     try {
         yield Promise.all(issues.map((issue) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
             issue.reviewersInSlack = reviewersInSlack;
@@ -170,13 +181,17 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
             issue.browseURL = `${JIRA_BASE_URL}browse/${issue.key}`;
             const finalRequestBody = Object.assign({ issueIdOrKey: issue.key }, requestBodyBase);
             // assign to Code Reviewer in Jira
-            return yield jira.issues.editIssue(finalRequestBody);
+            const jiraEditResp = yield jira.issues.editIssue(finalRequestBody);
+            core.debug('Jira Editing response::');
+            core.debug(JSON.stringify(jiraEditResp, null, 4));
         })));
     }
     catch (e) {
         console.error(`Updating Jira tickets ${keysForLogging} failed:`);
         return core.setFailed(e);
     }
+    core.endGroup();
+    core.startGroup('Send Slack Notification');
     let slackResponse;
     try {
         // Only send notificaton if they are people to notify
@@ -185,13 +200,16 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
         // Send only one notification to Slack with all issues
         const json = (0, CodeReviewNotification_1.default)(issues, github_1.context);
         slackResponse = yield webhook.send(json);
-        console.log('Slack notification json::', JSON.stringify(json, null, 4));
+        core.info('Slack notification json::');
+        core.info(JSON.stringify(json, null, 4));
+        core.debug('slackResponse:');
+        core.debug(slackResponse);
     }
     catch (e) {
         console.error(`Sending Slack notification for ticket ${keysForLogging} failed:`);
         core.setFailed(e);
     }
     // TODO: transition issue
-    return slackResponse;
+    core.endGroup();
 });
 onPRCreateOrReview();

@@ -65,7 +65,9 @@ const getIssueKeysfromBranch = async () => {
   } = payload;
 
   if (!pull_request) {
-    core.setFailed("Seems like there's no pull_request attached to the Github context; are you sure you're hooked up to the right event type?");
+    core.setFailed(
+      "Seems like there's no pull_request attached to the Github context; are you sure you're hooked up to the right event type?"
+    );
   }
   const {
     title,
@@ -86,7 +88,7 @@ const getIssueKeysfromBranch = async () => {
   if (!branchMatches?.length && !titleMatches?.length) {
     try {
       // TODO: Add a label to issue that there's no Jira ticket
-      console.error("no ticket")
+      console.error('no ticket');
     } catch (e) {
       return new Error(
         `No issue keys found in branch name "${branch} and unable to label PR."`
@@ -105,7 +107,8 @@ const getIssueKeysfromBranch = async () => {
  * @param {Object} issue An issue from Jira
  * @returns {Object} The issue with custom fields translated to plain text
  */
-const formatCustomFields = (issue) => {
+const formatCustomFields = issue => {
+  core.startGroup('Formatting issue fields');
   const { names: customFields } = issue;
   let fieldMap = {};
   Object.keys(customFields)
@@ -121,9 +124,11 @@ const formatCustomFields = (issue) => {
     });
   // replace the old names area with the new map
   issue.names = fieldMap;
+  core.debug(`Issue${issue.key}Formatted::`);
+  core.debug(issue);
+  core.endGroup();
   return issue;
 };
-
 
 /**
  * Get the Jira information for a set of Jira issues by key
@@ -131,7 +136,7 @@ const formatCustomFields = (issue) => {
  * @returns {Array} The information from Jira for those issue keys
  */
 const getIssueInfoFromKeys = async (keys: unknown[] | string[] | Error) => {
-  core.startGroup('Retrieve Jira Info by Keys')
+  core.startGroup('Retrieve Jira Info by Keys');
   if (keys instanceof Error) return;
   const issuesData = await Promise.all(
     keys.map(async key => {
@@ -164,7 +169,7 @@ const getIssueInfoFromKeys = async (keys: unknown[] | string[] | Error) => {
  */
 
 const getReviewersInfo = () => {
-  core.startGroup('Retrieve reviwer information')
+  core.startGroup('Retrieve reviwer information');
   const {
     payload: { requested_reviewers }
   } = context;
@@ -172,13 +177,14 @@ const getReviewersInfo = () => {
   if (!requested_reviewers) return [];
   // find the user in the map
   return requested_reviewers.map(({ login }) => {
-    console.log('requested reviewers::', login)
+    console.log('requested reviewers::', login);
     return users.find(user => user.github.account === login);
   });
-  core.endGroup()
+  core.endGroup();
 };
 
 const onPRCreateOrReview = async () => {
+  core.startGroup('Start `onPRCreateorReview`');
   // Get the issue keys from the PR title and branch name
   const keys = await getIssueKeysfromBranch();
 
@@ -186,6 +192,7 @@ const onPRCreateOrReview = async () => {
   let issues = [];
   if (keys instanceof Error) {
     return keys;
+    core.setFailed('Invalue issue keys.');
   }
   try {
     issues = await getIssueInfoFromKeys(keys);
@@ -195,19 +202,24 @@ const onPRCreateOrReview = async () => {
 
   // Get the reviewer's info from the usersmap
   const reviewersInfo = getReviewersInfo();
+  core.debug('reviewersInfo::');
+  core.debug(reviewersInfo);
   const reviewersInJira = reviewersInfo.map(r => {
     return { accountId: r.jira.accountId };
   });
   let reviewersSlackList = reviewersInfo.map(r => `<@${r.slack.id}>`);
-  let reviewersInSlack = reviewersSlackList.join(', ')
+  let reviewersInSlack = reviewersSlackList.join(', ');
 
   const requestBodyBase = {
     fields: {
-      [issues[0].names["codeReviewerS"]]: reviewersInJira
+      [issues[0].names['codeReviewerS']]: reviewersInJira
     }
   };
+  core.info('Jira requestBodyBase::');
+  core.info(JSON.stringify(requestBodyBase, null, 4) || '');
 
-  const keysForLogging = issues.map(i => i.key).join();
+  core.setOutput('issueKeys', issues);
+  const keysForLogging = keys.join();
 
   try {
     await Promise.all(
@@ -221,13 +233,17 @@ const onPRCreateOrReview = async () => {
           ...requestBodyBase
         };
         // assign to Code Reviewer in Jira
-        return await jira.issues.editIssue(finalRequestBody);
+        const jiraEditResp = await jira.issues.editIssue(finalRequestBody);
+        core.debug('Jira Editing response::');
+        core.debug(JSON.stringify(jiraEditResp, null, 4));
       })
     );
   } catch (e) {
     console.error(`Updating Jira tickets ${keysForLogging} failed:`);
     return core.setFailed(e);
   }
+  core.endGroup();
+  core.startGroup('Send Slack Notification');
   let slackResponse;
   try {
     // Only send notificaton if they are people to notify
@@ -236,13 +252,18 @@ const onPRCreateOrReview = async () => {
     // Send only one notification to Slack with all issues
     const json = CodeReviewNotification(issues, context);
     slackResponse = await webhook.send(json);
-    console.log('Slack notification json::', JSON.stringify(json, null, 4));
+    core.info('Slack notification json::');
+    core.info(JSON.stringify(json, null, 4));
+    core.debug('slackResponse:');
+    core.debug(slackResponse);
   } catch (e) {
-    console.error(`Sending Slack notification for ticket ${keysForLogging} failed:`);
+    console.error(
+      `Sending Slack notification for ticket ${keysForLogging} failed:`
+    );
     core.setFailed(e);
   }
   // TODO: transition issue
-  return slackResponse;
+  core.endGroup();
 };
 
 onPRCreateOrReview();
