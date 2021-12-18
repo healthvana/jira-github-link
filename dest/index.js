@@ -13,7 +13,7 @@ const CodeReviewNotification_1 = (0, tslib_1.__importDefault)(require("./templat
 const { SLACK_WEBHOOK_URL, SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL, USERS_PATH, GITHUB_WORKSPACE, USERS } = process.env;
 // Easily swap whether we're posting to Slack in "dev" (DMs)
 // or "prod" (the actual channel we want to post to)
-const webhookURL = SLACK_WEBHOOK_URL_DEV;
+const webhookURL = SLACK_WEBHOOK_URL;
 // Setup Jira client
 const jira = new jira_js_1.Version2Client({
     host: JIRA_BASE_URL,

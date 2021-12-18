@@ -24,7 +24,7 @@ const {
 
 // Easily swap whether we're posting to Slack in "dev" (DMs)
 // or "prod" (the actual channel we want to post to)
-const webhookURL = SLACK_WEBHOOK_URL_DEV;
+const webhookURL = SLACK_WEBHOOK_URL;
 
 // Setup Jira client
 const jira = new Version2Client({
