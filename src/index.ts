@@ -73,6 +73,9 @@ const getIssueKeysfromBranch = async () => {
     title,
     head: { ref: branch }
   } = pull_request;
+  core.startGroup('GithubContext');
+  core.info(JSON.stringify(pull_request, null, 2));
+  core.endGroup();
 
   // Get all existing project keys from Jira
   const projectsInfo = await jira.projects.getAllProjects();
@@ -84,19 +87,26 @@ const getIssueKeysfromBranch = async () => {
   const branchMatches = branch.match(regexp);
   const titleMatches = title.match(regexp);
 
+  core.debug('branchMatches::');
+  core.debug(branchMatches);
+  core.debug('titleMatches::');
+  core.debug(titleMatches);
+
   // If none, throw; label PR
   if (!branchMatches?.length && !titleMatches?.length) {
     try {
       // TODO: Add a label to issue that there's no Jira ticket
       console.error('no ticket');
     } catch (e) {
-      return new Error(
+      core.setFailed(
         `No issue keys found in branch name "${branch} and unable to label PR."`
       );
     }
-    return new Error(
+    return;
+    core.setFailed(
       `No issue keys found in branch name "${branch}"; PR label added.`
     );
+    return;
   }
   // TODO: Format PR title with issue key(s) and summaries
   return [...new Set(branchMatches.concat(titleMatches))];
@@ -135,9 +145,8 @@ const formatCustomFields = issue => {
  * @param {Array} keys An array of strings of issue keys
  * @returns {Array} The information from Jira for those issue keys
  */
-const getIssueInfoFromKeys = async (keys: unknown[] | string[] | Error) => {
+const getIssueInfoFromKeys = async (keys: unknown[] | string[]) => {
   core.startGroup('Retrieve Jira Info by Keys');
-  if (keys instanceof Error) return;
   const issuesData = await Promise.all(
     keys.map(async key => {
       let data = null;
@@ -171,9 +180,14 @@ const getIssueInfoFromKeys = async (keys: unknown[] | string[] | Error) => {
 const getReviewersInfo = () => {
   core.startGroup('Retrieve reviwer information');
   const {
-    payload: { requested_reviewers }
+    payload: {
+      pull_request: { requested_reviewers }
+    }
   } = context;
+  core.info('requested_reviewers::');
+  core.info(requested_reviewers);
   const users = JSON.parse(USERS);
+
   if (!requested_reviewers) return [];
   // find the user in the map
   return requested_reviewers.map(({ login }) => {

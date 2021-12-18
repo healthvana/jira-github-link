@@ -30,5 +30,5 @@
     "get-users-dev": "node -r dotenv/config ./dest/getUsers.js users",
     "watch": "tsc -p ./ --watch"
   },
-  "version": "1.0.34"
+  "version": "1.0.35"
 }

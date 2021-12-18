@@ -44,6 +44,9 @@ const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void
         core.setFailed("Seems like there's no pull_request attached to the Github context; are you sure you're hooked up to the right event type?");
     }
     const { title, head: { ref: branch } } = pull_request;
+    core.startGroup('GithubContext');
+    core.info(JSON.stringify(pull_request, null, 2));
+    core.endGroup();
     // Get all existing project keys from Jira
     const projectsInfo = yield jira.projects.getAllProjects();
     const projects = projectsInfo.map(prj => prj.key);
@@ -52,6 +55,10 @@ const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void
     const regexp = new RegExp(projectsRegex, 'gi');
     const branchMatches = branch.match(regexp);
     const titleMatches = title.match(regexp);
+    core.debug('branchMatches::');
+    core.debug(branchMatches);
+    core.debug('titleMatches::');
+    core.debug(titleMatches);
     // If none, throw; label PR
     if (!(branchMatches === null || branchMatches === void 0 ? void 0 : branchMatches.length) && !(titleMatches === null || titleMatches === void 0 ? void 0 : titleMatches.length)) {
         try {
@@ -59,9 +66,11 @@ const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void
             console.error('no ticket');
         }
         catch (e) {
-            return new Error(`No issue keys found in branch name "${branch} and unable to label PR."`);
+            core.setFailed(`No issue keys found in branch name "${branch} and unable to label PR."`);
         }
-        return new Error(`No issue keys found in branch name "${branch}"; PR label added.`);
+        return;
+        core.setFailed(`No issue keys found in branch name "${branch}"; PR label added.`);
+        return;
     }
     // TODO: Format PR title with issue key(s) and summaries
     return [...new Set(branchMatches.concat(titleMatches))];
@@ -100,8 +109,6 @@ const formatCustomFields = issue => {
  */
 const getIssueInfoFromKeys = (keys) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
     core.startGroup('Retrieve Jira Info by Keys');
-    if (keys instanceof Error)
-        return;
     const issuesData = yield Promise.all(keys.map((key) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
         let data = null;
         try {
@@ -129,7 +136,9 @@ const getIssueInfoFromKeys = (keys) => (0, tslib_1.__awaiter)(void 0, void 0, vo
  */
 const getReviewersInfo = () => {
     core.startGroup('Retrieve reviwer information');
-    const { payload: { requested_reviewers } } = github_1.context;
+    const { payload: { pull_request: { requested_reviewers } } } = github_1.context;
+    core.info('requested_reviewers::');
+    core.info(requested_reviewers);
     const users = JSON.parse(USERS);
     if (!requested_reviewers)
         return [];
