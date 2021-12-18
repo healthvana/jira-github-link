@@ -14,7 +14,6 @@ const { SLACK_WEBHOOK_URL, SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAI
 // Have to dynamically import the users map
 // based on the path provided by the caller Workflow
 const h = (0, path_1.resolve)(GITHUB_WORKSPACE, USERS_PATH);
-let users = [];
 const getUsersFromFile = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
     return yield Promise.resolve().then(() => (0, tslib_1.__importStar)(require(h)));
 });
@@ -194,6 +193,11 @@ const onPRCreateOrReview = (users) => (0, tslib_1.__awaiter)(void 0, void 0, voi
     }
     // TODO: transition issue
 });
-getUsersFromFile().then(users => {
+getUsersFromFile().catch(e => {
+    console.error("Couldnt get users from file.");
+    throw new Error(e);
+}).then(module => {
+    const users = module.default;
+    console.log('USERS::', JSON.stringify(users, null, 4));
     onPRCreateOrReview(users);
 });

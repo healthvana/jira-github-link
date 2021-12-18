@@ -24,7 +24,7 @@ const {
 // Have to dynamically import the users map
 // based on the path provided by the caller Workflow
 const h = resolve(GITHUB_WORKSPACE, USERS_PATH);
-let users = [];
+
 const getUsersFromFile = async () => {
   return await import(h);
 }
@@ -244,7 +244,12 @@ const onPRCreateOrReview = async (users) => {
   // TODO: transition issue
 };
 
-getUsersFromFile().then(users => {
+getUsersFromFile().catch(e => {
+  console.error("Couldnt get users from file.");
+  throw new Error(e)
+}).then(module => {
+  const users = module.default;
+  console.log('USERS::', JSON.stringify(users, null, 4));
   onPRCreateOrReview(users);
 });
 
