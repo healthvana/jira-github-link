@@ -1,3 +1,4 @@
+import { resolve } from 'path';
 import core from '@actions/core';
 import { context } from '@actions/github';
 import { IncomingWebhook } from '@slack/webhook';
@@ -13,14 +14,15 @@ const {
   JIRA_API_TOKEN,
   JIRA_USER_EMAIL,
   JIRA_BASE_URL,
-  USERS_PATH
+  USERS_PATH,
+  GITHUB_WORKSPACE
 } = process.env;
 
 console.log("process.env::", process.env)
 
 let users = [];
 const getUsersFromFile = async () => {
-  users = await import(USERS_PATH);
+  users = await import(resolve(GITHUB_WORKSPACE, USERS_PATH));
 }
 
 const webhookURL = SLACK_WEBHOOK_URL_DEV;
