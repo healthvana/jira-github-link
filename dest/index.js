@@ -175,5 +175,5 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
     // TO DO: transition issue
     //
 });
-getUsersFromFile();
+// getUsersFromFile();
 onPRCreateOrReview();

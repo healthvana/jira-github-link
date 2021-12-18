@@ -228,5 +228,5 @@ const onPRCreateOrReview = async () => {
   // TO DO: transition issue
   //
 };
-getUsersFromFile();
+// getUsersFromFile();
 onPRCreateOrReview();
