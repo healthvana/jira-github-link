@@ -6,14 +6,20 @@ const github_1 = require("@actions/github");
 const webhook_1 = require("@slack/webhook");
 const jira_js_1 = require("jira.js");
 const lodash_1 = require("lodash");
+// Slack notification template
 const CodeReviewNotification_1 = (0, tslib_1.__importDefault)(require("./templates/CodeReviewNotification"));
-// --- FOR PROD
+// Environment variables. Uses Github's provided variables in Prod
+// and a dotenv file locally for development.
 const { SLACK_WEBHOOK_URL, SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL, USERS_PATH, GITHUB_WORKSPACE } = process.env;
+// Have to dynamically import the users map
+// based on the path provided by the caller Workflow
 const h = (0, path_1.resolve)(GITHUB_WORKSPACE, USERS_PATH);
 let users = [];
 const getUsersFromFile = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
     users = yield Promise.resolve().then(() => (0, tslib_1.__importStar)(require(h)));
 });
+// Easily swap whether we're posting to Slack in "dev" (DMs)
+// or "prod" (the actual channel we want to post to)
 const webhookURL = SLACK_WEBHOOK_URL_DEV;
 // Setup Jira client
 const jira = new jira_js_1.Version2Client({
@@ -26,10 +32,11 @@ const jira = new jira_js_1.Version2Client({
     },
     telemetry: false
 });
-// const context = github.context;
 //Setup Slack Client
 const webhook = new webhook_1.IncomingWebhook(webhookURL);
-// ----------WORKFLOW
+// Note: Github context is pre-hydrated by the Actions system
+// TODO: Add a fully authed Octokit client to perform github actions
+// ---------- ACTION FUNCTIONS
 /**
  * Uses the context from a github action to take
  * the title and branch name in question and pull out
@@ -40,7 +47,6 @@ const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void
     // Get PR info from Github Action context
     const { payload } = github_1.context;
     const { pull_request: { title, head: { ref: branch } }, number: issue_number, repository: { name: repo, owner: { login: owner } } } = payload;
-    console.log('payload::', payload);
     // Get all existing project keys from Jira
     const projectsInfo = yield jira.projects.getAllProjects();
     const projects = projectsInfo.map(prj => prj.key);
@@ -52,6 +58,7 @@ const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void
     // If none, throw; label PR
     if (!(branchMatches === null || branchMatches === void 0 ? void 0 : branchMatches.length) && !(titleMatches === null || titleMatches === void 0 ? void 0 : titleMatches.length)) {
         try {
+            // TODO: Add a label to issue that there's no Jira ticket
             console.log("no ticket");
         }
         catch (e) {
@@ -59,6 +66,7 @@ const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void
         }
         return new Error(`No issue keys found in branch name "${branch}"; PR label added.`);
     }
+    // TODO: Format PR title with issue key(s) and summaries
     return [...new Set(branchMatches.concat(titleMatches))];
 });
 /**
@@ -85,7 +93,7 @@ const formatCustomFields = (issue) => {
     return issue;
 };
 /**
- *
+ * Get the Jira information for a set of Jira issues by key
  * @param {Array} keys An array of strings of issue keys
  * @returns {Array} The information from Jira for those issue keys
  */
@@ -106,13 +114,14 @@ const getIssueInfoFromKeys = (keys) => (0, tslib_1.__awaiter)(void 0, void 0, vo
         }
         return data;
     })));
-    // TO DO: Fetch Epic issue info as well, and append to issue as `issue.epic`
-    const formattedissues = issuesData.map(formatCustomFields);
-    return formattedissues;
+    // TODO: Fetch Epic issue info as well, and append to issue as `issue.epic`
+    return issuesData.map(formatCustomFields);
 });
 /**
- *
- * @param {Object} issueInfo
+ * Get the github login from the PR that triggered the action
+ * and get that person's information on all three systems
+ * (Slack, Jira, Github)
+ * @returns {Object} A map of the reviewers information
  */
 const getReviewersInfo = () => {
     const { payload: { requested_reviewers } } = github_1.context;
@@ -171,4 +180,4 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
     //
 });
 getUsersFromFile();
-// onPRCreateOrReview();
+onPRCreateOrReview();
