@@ -151,16 +151,16 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
     const reviewersInJira = reviewersInfo.map(r => {
         return { accountId: r.jira.accountId };
     });
-    let reviewersInSlackList = reviewersInfo.map(reviewer => `<@${reviewer.slack.id}>`);
-    let reviewersInSlack = reviewersInSlackList.join(', ');
+    let reviewersSlackList = reviewersInfo.map(r => `<@${r.slack.id}>`);
+    let reviewersInSlack = reviewersSlackList.join(', ');
     const requestBodyBase = {
         fields: {
             [issues[0].names["codeReviewerS"]]: reviewersInJira
         }
     };
-    let reviwerAssignResponse;
+    const keysForLogging = issues.map(i => i.key).join();
     try {
-        reviwerAssignResponse = yield Promise.all(issues.map((issue) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
+        yield Promise.all(issues.map((issue) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
             issue.reviewersInSlack = reviewersInSlack;
             issue.epicURL = `${JIRA_BASE_URL}browse/${issue.fields.epicLink}`;
             issue.browseURL = `${JIRA_BASE_URL}browse/${issue.key}`;
@@ -168,16 +168,22 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
             // assign to Code Reviewer in Jira
             return yield jira.issues.editIssue(finalRequestBody);
         })));
+    }
+    catch (e) {
+        console.log(`Updating Jira tickets ${keysForLogging} failed:`);
+        console.log(e);
+    }
+    try {
         // Send only one notification to Slack with all issues
         const json = (0, CodeReviewNotification_1.default)(issues, github_1.context);
         yield webhook.send(json);
-        // console.log(json)
+        console.log('Slack notification json::', json);
     }
     catch (e) {
+        console.log(`Sending Slack notification for ticket ${keysForLogging} failed:`);
         console.log(e);
     }
-    // TO DO: transition issue
-    //
+    // TODO: transition issue
 });
 getUsersFromFile();
 onPRCreateOrReview();

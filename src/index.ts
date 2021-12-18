@@ -192,8 +192,8 @@ const onPRCreateOrReview = async () => {
   const reviewersInJira = reviewersInfo.map(r => {
     return { accountId: r.jira.accountId };
   });
-  let reviewersInSlackList = reviewersInfo.map(reviewer => `<@${reviewer.slack.id}>`);
-  let reviewersInSlack = reviewersInSlackList.join(', ')
+  let reviewersSlackList = reviewersInfo.map(r => `<@${r.slack.id}>`);
+  let reviewersInSlack = reviewersSlackList.join(', ')
 
   const requestBodyBase = {
     fields: {
@@ -201,10 +201,10 @@ const onPRCreateOrReview = async () => {
     }
   };
 
-  let reviwerAssignResponse;
+  const keysForLogging = issues.map(i => i.key).join();
 
   try {
-    reviwerAssignResponse = await Promise.all(
+    await Promise.all(
       issues.map(async issue => {
         issue.reviewersInSlack = reviewersInSlack;
         issue.epicURL = `${JIRA_BASE_URL}browse/${issue.fields.epicLink}`;
@@ -218,15 +218,20 @@ const onPRCreateOrReview = async () => {
         return await jira.issues.editIssue(finalRequestBody);
       })
     );
+  } catch (e) {
+    console.log(`Updating Jira tickets ${keysForLogging} failed:`);
+    console.log(e);
+  }
+  try {
     // Send only one notification to Slack with all issues
     const json = CodeReviewNotification(issues, context);
     await webhook.send(json);
-    // console.log(json)
+    console.log('Slack notification json::', json);
   } catch (e) {
+    console.log(`Sending Slack notification for ticket ${keysForLogging} failed:`);
     console.log(e);
   }
-  // TO DO: transition issue
-  //
+  // TODO: transition issue
 };
 
 getUsersFromFile();
