@@ -2,6 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
 const path_1 = require("path");
+const core = (0, tslib_1.__importStar)(require("@actions/core"));
 const github_1 = require("@actions/github");
 const webhook_1 = require("@slack/webhook");
 const jira_js_1 = require("jira.js");
@@ -10,11 +11,11 @@ const lodash_1 = require("lodash");
 const CodeReviewNotification_1 = (0, tslib_1.__importDefault)(require("./templates/CodeReviewNotification"));
 // Environment variables. Uses Github's provided variables in Prod
 // and a dotenv file locally for development.
-const { SLACK_WEBHOOK_URL, SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL, USERS_PATH, GITHUB_WORKSPACE } = process.env;
+const { SLACK_WEBHOOK_URL, SLACK_WEBHOOK_URL_DEV, JIRA_API_TOKEN, JIRA_USER_EMAIL, JIRA_BASE_URL, USERS_PATH, GITHUB_WORKSPACE, USERS } = process.env;
 // Have to dynamically import the users map
 // based on the path provided by the caller Workflow
-const h = (0, path_1.resolve)(GITHUB_WORKSPACE, USERS_PATH);
 const getUsersFromFile = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
+    const h = (0, path_1.resolve)(GITHUB_WORKSPACE, USERS_PATH);
     return yield Promise.resolve().then(() => (0, tslib_1.__importStar)(require(h)));
 });
 // Easily swap whether we're posting to Slack in "dev" (DMs)
@@ -47,7 +48,7 @@ const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void
     const { payload } = github_1.context;
     const { pull_request, number: issue_number, repository: { name: repo, owner: { login: owner } } } = payload;
     if (!pull_request) {
-        console.error("Seems like there's no pull_request attached to the Github context; are you sure you're hooked up to the right event type?");
+        core.setFailed("Seems like there's no pull_request attached to the Github context; are you sure you're hooked up to the right event type?");
     }
     const { title, head: { ref: branch } } = pull_request;
     // Get all existing project keys from Jira
@@ -101,6 +102,7 @@ const formatCustomFields = (issue) => {
  * @returns {Array} The information from Jira for those issue keys
  */
 const getIssueInfoFromKeys = (keys) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
+    core.startGroup('Retrieve Jira Info by Keys');
     if (keys instanceof Error)
         return;
     const issuesData = yield Promise.all(keys.map((key) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
@@ -113,12 +115,13 @@ const getIssueInfoFromKeys = (keys) => (0, tslib_1.__awaiter)(void 0, void 0, vo
         }
         catch (e) {
             console.error(`Issue ${key} could not be found in Jira or could not be fetched:`);
-            return new Error(e);
+            core.setFailed(e);
         }
         return data;
     })));
     // TODO: Fetch Epic issue info as well, and append to issue as `issue.epic`
     return issuesData.map(formatCustomFields);
+    core.endGroup();
 });
 /**
  * Get the github login from the PR that triggered the action
@@ -127,8 +130,10 @@ const getIssueInfoFromKeys = (keys) => (0, tslib_1.__awaiter)(void 0, void 0, vo
  * @param {Array} users Dynamically fetched user map
  * @returns {Object} A map of the reviewers information
  */
-const getReviewersInfo = (users) => {
+const getReviewersInfo = () => {
+    core.startGroup('Retrieve reviwer information');
     const { payload: { requested_reviewers } } = github_1.context;
+    const users = JSON.parse(USERS);
     if (!requested_reviewers)
         return [];
     // find the user in the map
@@ -136,8 +141,9 @@ const getReviewersInfo = (users) => {
         console.log('requested reviewers::', login);
         return users.find(user => user.github.account === login);
     });
+    core.endGroup();
 };
-const onPRCreateOrReview = (users) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
+const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
     // Get the issue keys from the PR title and branch name
     const keys = yield getIssueKeysfromBranch();
     // Get the info from Jira for those issue keys
@@ -149,10 +155,10 @@ const onPRCreateOrReview = (users) => (0, tslib_1.__awaiter)(void 0, void 0, voi
         issues = yield getIssueInfoFromKeys(keys);
     }
     catch (e) {
-        return new Error('Unable to return issue info');
+        core.setFailed(e);
     }
     // Get the reviewer's info from the usersmap
-    const reviewersInfo = getReviewersInfo(users);
+    const reviewersInfo = getReviewersInfo();
     const reviewersInJira = reviewersInfo.map(r => {
         return { accountId: r.jira.accountId };
     });
@@ -176,28 +182,33 @@ const onPRCreateOrReview = (users) => (0, tslib_1.__awaiter)(void 0, void 0, voi
     }
     catch (e) {
         console.error(`Updating Jira tickets ${keysForLogging} failed:`);
-        return new Error(e);
+        return core.setFailed(e);
     }
+    let slackResponse;
     try {
         // Only send notificaton if they are people to notify
         if (!reviewersInfo.length)
             return;
         // Send only one notification to Slack with all issues
         const json = (0, CodeReviewNotification_1.default)(issues, github_1.context);
-        yield webhook.send(json);
+        slackResponse = yield webhook.send(json);
         console.log('Slack notification json::', JSON.stringify(json, null, 4));
     }
     catch (e) {
         console.error(`Sending Slack notification for ticket ${keysForLogging} failed:`);
-        return new Error(e);
+        core.setFailed(e);
     }
     // TODO: transition issue
+    return slackResponse;
 });
-getUsersFromFile().catch(e => {
-    console.error("Couldnt get users from file.");
-    throw new Error(e);
-}).then((module) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
-    const users = module.default;
-    console.log('USERS::', JSON.stringify(users, null, 4));
-    yield onPRCreateOrReview(users);
-}));
+switch (process.argv[2]) {
+    case 'users':
+        getUsersFromFile().then((module) => (0, tslib_1.__awaiter)(void 0, void 0, void 0, function* () {
+            const users = module.default;
+            core.exportVariable('USERS', JSON.stringify(users));
+        }));
+        break;
+    default:
+        onPRCreateOrReview();
+        break;
+}

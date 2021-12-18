@@ -1,6 +1,6 @@
 import { resolve, dirname } from 'path';
 import fs from 'fs';
-import core from '@actions/core';
+import * as core from '@actions/core';
 import { context } from '@actions/github';
 import { IncomingWebhook } from '@slack/webhook';
 import { Version2Client } from 'jira.js';
@@ -18,14 +18,15 @@ const {
   JIRA_USER_EMAIL,
   JIRA_BASE_URL,
   USERS_PATH,
-  GITHUB_WORKSPACE
+  GITHUB_WORKSPACE,
+  USERS
 } = process.env;
 
 // Have to dynamically import the users map
 // based on the path provided by the caller Workflow
-const h = resolve(GITHUB_WORKSPACE, USERS_PATH);
 
 const getUsersFromFile = async () => {
+  const h = resolve(GITHUB_WORKSPACE, USERS_PATH);
   return await import(h);
 }
 
@@ -72,7 +73,7 @@ const getIssueKeysfromBranch = async () => {
   } = payload;
 
   if (!pull_request) {
-    console.error("Seems like there's no pull_request attached to the Github context; are you sure you're hooked up to the right event type?")
+    core.setFailed("Seems like there's no pull_request attached to the Github context; are you sure you're hooked up to the right event type?");
   }
   const {
     title,
@@ -138,6 +139,7 @@ const formatCustomFields = (issue) => {
  * @returns {Array} The information from Jira for those issue keys
  */
 const getIssueInfoFromKeys = async (keys: unknown[] | string[] | Error) => {
+  core.startGroup('Retrieve Jira Info by Keys')
   if (keys instanceof Error) return;
   const issuesData = await Promise.all(
     keys.map(async key => {
@@ -151,13 +153,14 @@ const getIssueInfoFromKeys = async (keys: unknown[] | string[] | Error) => {
         console.error(
           `Issue ${key} could not be found in Jira or could not be fetched:`
         );
-        return new Error(e);
+        core.setFailed(e);
       }
       return data;
     })
   );
   // TODO: Fetch Epic issue info as well, and append to issue as `issue.epic`
   return issuesData.map(formatCustomFields);
+  core.endGroup();
 };
 
 /**
@@ -167,19 +170,23 @@ const getIssueInfoFromKeys = async (keys: unknown[] | string[] | Error) => {
  * @param {Array} users Dynamically fetched user map
  * @returns {Object} A map of the reviewers information
  */
-const getReviewersInfo = (users) => {
+
+const getReviewersInfo = () => {
+  core.startGroup('Retrieve reviwer information')
   const {
     payload: { requested_reviewers }
   } = context;
+  const users = JSON.parse(USERS);
   if (!requested_reviewers) return [];
   // find the user in the map
   return requested_reviewers.map(({ login }) => {
     console.log('requested reviewers::', login)
     return users.find(user => user.github.account === login);
   });
+  core.endGroup()
 };
 
-const onPRCreateOrReview = async (users) => {
+const onPRCreateOrReview = async () => {
   // Get the issue keys from the PR title and branch name
   const keys = await getIssueKeysfromBranch();
 
@@ -191,11 +198,11 @@ const onPRCreateOrReview = async (users) => {
   try {
     issues = await getIssueInfoFromKeys(keys);
   } catch (e) {
-    return new Error('Unable to return issue info');
+    core.setFailed(e);
   }
 
   // Get the reviewer's info from the usersmap
-  const reviewersInfo = getReviewersInfo(users);
+  const reviewersInfo = getReviewersInfo();
   const reviewersInJira = reviewersInfo.map(r => {
     return { accountId: r.jira.accountId };
   });
@@ -227,29 +234,35 @@ const onPRCreateOrReview = async (users) => {
     );
   } catch (e) {
     console.error(`Updating Jira tickets ${keysForLogging} failed:`);
-    return new Error(e);
+    return core.setFailed(e);
   }
+  let slackResponse;
   try {
     // Only send notificaton if they are people to notify
     if (!reviewersInfo.length) return;
 
     // Send only one notification to Slack with all issues
     const json = CodeReviewNotification(issues, context);
-    await webhook.send(json);
+    slackResponse = await webhook.send(json);
     console.log('Slack notification json::', JSON.stringify(json, null, 4));
   } catch (e) {
     console.error(`Sending Slack notification for ticket ${keysForLogging} failed:`);
-    return new Error(e);
+    core.setFailed(e);
   }
   // TODO: transition issue
+  return slackResponse;
 };
 
-getUsersFromFile().catch(e => {
-  console.error("Couldnt get users from file.");
-  throw new Error(e)
-}).then(async module => {
-  const users = module.default;
-  console.log('USERS::', JSON.stringify(users, null, 4));
-  await onPRCreateOrReview(users);
-});
 
+
+switch (process.argv[2]) {
+  case 'users':
+    getUsersFromFile().then(async module => {
+      const users = module.default;
+      core.exportVariable('USERS', JSON.stringify(users));
+    });
+    break;
+  default:
+    onPRCreateOrReview();
+    break;
+}

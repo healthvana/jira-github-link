@@ -26,7 +26,9 @@
     "dev": "node --loader ts-node/esm ./src/index.ts",
     "dev-exec": "node -r dotenv/config ./dest/index.js",
     "exec": "node ./dest/index.js",
-    "watch": "tsc -p ./ --watch"
+    "watch": "tsc -p ./ --watch",
+    "get-users": "node ./dest/index.js users",
+    "get-users-dev": "node -r dotenv/config ./dest/index.js users"
   },
   "version": "1.0.31"
 }

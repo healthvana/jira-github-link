@@ -31,6 +31,13 @@ runs:
     - name: Install deps
       run: cd $GITHUB_ACTION_PATH; npm i
       shell: bash
+      id: installDeps
+    - name: Get users
+      id: getUsers
+      run: cd $GITHUB_ACTION_PATH; npm run get-users
+      shell: bash
+      env:
+        USERS_PATH: ${{inputs.USERS_PATH}}
     - name: Assign Code Reviewer in Jira and notify in Slack
       run: cd $GITHUB_ACTION_PATH; npm run exec
       env:
@@ -39,7 +46,6 @@ runs:
         JIRA_USER_EMAIL: ${{ inputs.JIRA_USER_EMAIL }}
         SLACK_WEBHOOK_URL: ${{inputs.SLACK_WEBHOOK_URL}}
         SLACK_WEBHOOK_URL_DEV: ${{inputs.SLACK_WEBHOOK_URL_DEV}}
-        USERS_PATH: ${{inputs.USERS_PATH}}
       shell: bash
 branding:
   color: red
