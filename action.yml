@@ -17,7 +17,7 @@ inputs:
     required: true
   SLACK_WEBHOOK_URL_DEV:
     description: 'Webhook configured for the slack channel you want to develop against; maybe your DMs'
-    required: true
+    required: false
   USERS_PATH:
     description: 'path to a formatted JSON file of user information for Slack and Jira'
     required: true
