@@ -6,9 +6,11 @@ import { IncomingWebhook } from '@slack/webhook';
 import { Version2Client } from 'jira.js';
 import { camelCase } from 'lodash';
 
+// Slack notification template
 import CodeReviewNotification from './templates/CodeReviewNotification';
 
-// --- FOR PROD
+// Environment variables. Uses Github's provided variables in Prod
+// and a dotenv file locally for development.
 const {
   SLACK_WEBHOOK_URL,
   SLACK_WEBHOOK_URL_DEV,
@@ -19,13 +21,16 @@ const {
   GITHUB_WORKSPACE
 } = process.env;
 
+// Have to dynamically import the users map
+// based on the path provided by the caller Workflow
 const h = resolve(GITHUB_WORKSPACE, USERS_PATH);
-
 let users = [];
 const getUsersFromFile = async () => {
   users = await import(h);
 }
 
+// Easily swap whether we're posting to Slack in "dev" (DMs)
+// or "prod" (the actual channel we want to post to)
 const webhookURL = SLACK_WEBHOOK_URL_DEV;
 
 // Setup Jira client
@@ -40,12 +45,14 @@ const jira = new Version2Client({
   telemetry: false
 });
 
-// const context = github.context;
-
 //Setup Slack Client
 const webhook = new IncomingWebhook(webhookURL);
 
-// ----------WORKFLOW
+// Note: Github context is pre-hydrated by the Actions system
+// TODO: Add a fully authed Octokit client to perform github actions
+
+// ---------- ACTION FUNCTIONS
+
 /**
  * Uses the context from a github action to take
  * the title and branch name in question and pull out
@@ -66,7 +73,6 @@ const getIssueKeysfromBranch = async () => {
       owner: { login: owner }
     }
   } = payload;
-  console.log('payload::', payload);
 
   // Get all existing project keys from Jira
   const projectsInfo = await jira.projects.getAllProjects();
@@ -81,6 +87,7 @@ const getIssueKeysfromBranch = async () => {
   // If none, throw; label PR
   if (!branchMatches?.length && !titleMatches?.length) {
     try {
+      // TODO: Add a label to issue that there's no Jira ticket
       console.log("no ticket")
     } catch (e) {
       return new Error(
@@ -91,6 +98,7 @@ const getIssueKeysfromBranch = async () => {
       `No issue keys found in branch name "${branch}"; PR label added.`
     );
   }
+  // TODO: Format PR title with issue key(s) and summaries
   return [...new Set(branchMatches.concat(titleMatches))];
 };
 
@@ -120,7 +128,7 @@ const formatCustomFields = (issue) => {
 
 
 /**
- *
+ * Get the Jira information for a set of Jira issues by key
  * @param {Array} keys An array of strings of issue keys
  * @returns {Array} The information from Jira for those issue keys
  */
@@ -143,15 +151,15 @@ const getIssueInfoFromKeys = async (keys: unknown[] | string[] | Error) => {
       return data;
     })
   );
-  // TO DO: Fetch Epic issue info as well, and append to issue as `issue.epic`
-  const formattedissues = issuesData.map(formatCustomFields);
-  return formattedissues;
+  // TODO: Fetch Epic issue info as well, and append to issue as `issue.epic`
+  return issuesData.map(formatCustomFields);
 };
 
-
 /**
- *
- * @param {Object} issueInfo
+ * Get the github login from the PR that triggered the action
+ * and get that person's information on all three systems
+ * (Slack, Jira, Github)
+ * @returns {Object} A map of the reviewers information
  */
 const getReviewersInfo = () => {
   const {
@@ -220,5 +228,6 @@ const onPRCreateOrReview = async () => {
   // TO DO: transition issue
   //
 };
+
 getUsersFromFile();
-// onPRCreateOrReview();
+onPRCreateOrReview();

@@ -31,6 +31,7 @@ runs:
     - name: Install deps
       run: cd $GITHUB_ACTION_PATH; npm i
       shell: bash
+    - name: 
     - name: Assign Code Reviewer in Jira and notify in Slack
       run: cd $GITHUB_ACTION_PATH; npm run exec
       env:
