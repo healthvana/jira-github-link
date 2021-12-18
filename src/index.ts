@@ -165,7 +165,7 @@ const getReviewersInfo = () => {
   const {
     payload: { requested_reviewers }
   } = context;
-
+  if (!requested_reviewers) return [];
   // find the user in the map
   return requested_reviewers.map(({ login }) => {
     return users.find(user => user.github.account === login);

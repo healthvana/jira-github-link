@@ -123,6 +123,8 @@ const getIssueInfoFromKeys = (keys) => (0, tslib_1.__awaiter)(void 0, void 0, vo
  */
 const getReviewersInfo = () => {
     const { payload: { requested_reviewers } } = github_1.context;
+    if (!requested_reviewers)
+        return [];
     // find the user in the map
     return requested_reviewers.map(({ login }) => {
         return users.find(user => user.github.account === login);
