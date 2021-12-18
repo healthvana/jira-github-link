@@ -30,5 +30,5 @@
     "get-users": "node ./dest/index.js users",
     "get-users-dev": "node -r dotenv/config ./dest/index.js users"
   },
-  "version": "1.0.31"
+  "version": "1.0.32"
 }
