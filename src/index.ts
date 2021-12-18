@@ -1,4 +1,5 @@
-import { resolve } from 'path';
+import { resolve, dirname } from 'path';
+import fs from 'fs';
 import core from '@actions/core';
 import { context } from '@actions/github';
 import { IncomingWebhook } from '@slack/webhook';
@@ -18,11 +19,18 @@ const {
   GITHUB_WORKSPACE
 } = process.env;
 
-console.log("process.cwd()::", process.cwd())
+const h = resolve(GITHUB_WORKSPACE, USERS_PATH);
+
+fs.readdir(dirname(h), (err, files) => {
+  console.log(`files in ${dirname(h)}::`)
+  files.forEach(file => {
+    console.log(file);
+  });
+});
 
 let users = [];
 const getUsersFromFile = async () => {
-  users = await import(resolve(GITHUB_WORKSPACE, USERS_PATH));
+  users = await import(h);
 }
 
 const webhookURL = SLACK_WEBHOOK_URL_DEV;
