@@ -33,7 +33,7 @@ runs:
       shell: bash
     - name: Assign Code Reviewer in Jira and notify in Slack
       run: cd $GITHUB_ACTION_PATH; npm run exec
-      with:
+      env:
         JIRA_BASE_URL: ${{ inputs.JIRA_BASE_URL }}
         JIRA_API_TOKEN: ${{ inputs.JIRA_API_TOKEN }}
         JIRA_USER_EMAIL: ${{ inputs.JIRA_USER_EMAIL }}
