@@ -82,15 +82,15 @@ const getIssueKeysfromBranch = async () => {
   const projects = projectsInfo.map(prj => prj.key);
 
   // Look for possible keys using this regex
-  const projectsRegex = `((${projects.join('|')})-\\d{1,})`;
+  const projectsRegex = `((${projects.join('|')})[- _]\\d{1,})`;
   const regexp = new RegExp(projectsRegex, 'gi');
-  const branchMatches = branch.match(regexp);
-  const titleMatches = title.match(regexp);
+  const branchMatches = branch.match(regexp) || [];
+  const titleMatches = title.match(regexp) || [];
 
   core.debug('branchMatches::');
-  core.debug(branchMatches);
+  core.debug(JSON.stringify(branchMatches));
   core.debug('titleMatches::');
-  core.debug(titleMatches);
+  core.debug(JSON.stringify(titleMatches));
 
   // If none, throw; label PR
   if (!branchMatches?.length && !titleMatches?.length) {
@@ -108,8 +108,12 @@ const getIssueKeysfromBranch = async () => {
     );
     return;
   }
+  //make case insensitive
+  const branchI = branchMatches.map(k => k.toUpperCase());
+  const titleI = titleMatches.map(k => k.toUpperCase());
+
   // TODO: Format PR title with issue key(s) and summaries
-  return [...new Set(branchMatches.concat(titleMatches))];
+  return [...new Set(branchI.concat(titleI))];
 };
 
 /**
@@ -205,19 +209,17 @@ const onPRCreateOrReview = async () => {
   // Get the info from Jira for those issue keys
   let issues = [];
   if (keys instanceof Error) {
-    return keys;
-    core.setFailed('Invalue issue keys.');
+    core.setFailed('Invalid issue keys.');
+    return;
   }
   try {
     issues = await getIssueInfoFromKeys(keys);
-  } catch (e) {
-    core.setFailed(e);
-  }
+  } catch (e) {}
 
   // Get the reviewer's info from the usersmap
   const reviewersInfo = getReviewersInfo();
   core.debug('reviewersInfo::');
-  core.debug(reviewersInfo);
+  core.debug(JSON.stringify(reviewersInfo));
   const reviewersInJira = reviewersInfo.map(r => {
     return { accountId: r.jira.accountId };
   });
@@ -269,7 +271,7 @@ const onPRCreateOrReview = async () => {
     core.info('Slack notification json::');
     core.info(JSON.stringify(json, null, 4));
     core.debug('slackResponse:');
-    core.debug(slackResponse);
+    core.debug(JSON.stringify(slackResponse, null, 4));
   } catch (e) {
     console.error(
       `Sending Slack notification for ticket ${keysForLogging} failed:`
