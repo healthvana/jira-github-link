@@ -51,14 +51,14 @@ const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void
     const projectsInfo = yield jira.projects.getAllProjects();
     const projects = projectsInfo.map(prj => prj.key);
     // Look for possible keys using this regex
-    const projectsRegex = `((${projects.join('|')})-\\d{1,})`;
+    const projectsRegex = `((${projects.join('|')})[- _]\\d{1,})`;
     const regexp = new RegExp(projectsRegex, 'gi');
-    const branchMatches = branch.match(regexp);
-    const titleMatches = title.match(regexp);
+    const branchMatches = branch.match(regexp) || [];
+    const titleMatches = title.match(regexp) || [];
     core.debug('branchMatches::');
-    core.debug(branchMatches);
+    core.debug(JSON.stringify(branchMatches));
     core.debug('titleMatches::');
-    core.debug(titleMatches);
+    core.debug(JSON.stringify(titleMatches));
     // If none, throw; label PR
     if (!(branchMatches === null || branchMatches === void 0 ? void 0 : branchMatches.length) && !(titleMatches === null || titleMatches === void 0 ? void 0 : titleMatches.length)) {
         try {
@@ -72,8 +72,11 @@ const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void
         core.setFailed(`No issue keys found in branch name "${branch}"; PR label added.`);
         return;
     }
+    //make case insensitive
+    const branchI = branchMatches.map(k => k.toUpperCase());
+    const titleI = titleMatches.map(k => k.toUpperCase());
     // TODO: Format PR title with issue key(s) and summaries
-    return [...new Set(branchMatches.concat(titleMatches))];
+    return [...new Set(branchI.concat(titleI))];
 });
 /**
  * Mutates and transforms the standard Jira issue JSON format for easier use in templating
@@ -156,19 +159,17 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
     // Get the info from Jira for those issue keys
     let issues = [];
     if (keys instanceof Error) {
-        return keys;
-        core.setFailed('Invalue issue keys.');
+        core.setFailed('Invalid issue keys.');
+        return;
     }
     try {
         issues = yield getIssueInfoFromKeys(keys);
     }
-    catch (e) {
-        core.setFailed(e);
-    }
+    catch (e) { }
     // Get the reviewer's info from the usersmap
     const reviewersInfo = getReviewersInfo();
     core.debug('reviewersInfo::');
-    core.debug(reviewersInfo);
+    core.debug(JSON.stringify(reviewersInfo));
     const reviewersInJira = reviewersInfo.map(r => {
         return { accountId: r.jira.accountId };
     });
@@ -212,7 +213,7 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
         core.info('Slack notification json::');
         core.info(JSON.stringify(json, null, 4));
         core.debug('slackResponse:');
-        core.debug(slackResponse);
+        core.debug(JSON.stringify(slackResponse, null, 4));
     }
     catch (e) {
         console.error(`Sending Slack notification for ticket ${keysForLogging} failed:`);
