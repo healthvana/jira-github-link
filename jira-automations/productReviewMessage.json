@@ -1,0 +1,74 @@
+{
+	"blocks": [
+		{
+			"type": "header",
+			"text": {
+				"type": "plain_text",
+				"text": "{{issue.summary}}",
+				"emoji": true
+			}
+		},
+		{
+			"type": "section",
+			"text": {
+				"type": "mrkdwn",
+				"text": "*<{{issue.url}}|{{issue.key}}>* - Epic: <{{issue.epic.url}}|{{issue.epic.key}}>"
+			}
+		},
+		{
+			"type": "context",
+			"elements": [
+				{
+					"type": "plain_text",
+					"text": "Moved to Product Reivew."
+				}
+			]
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*{{issue.Product Reviewer.displayName}}* is assigned"
+				}
+			]
+		},
+		{
+			"type": "divider"
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*FB URL / Review Location:* <{{issue.FB URL / Review Location}}>"
+				}
+			]
+		},
+		{
+			"type": "section",
+			"fields": [
+				{
+					"type": "mrkdwn",
+					"text": "*Feature Family:*\n{{issue.Feature Family}}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Other risk areas:*\n{{issue.Other risk areas}}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Customer:*\n{{issue.Customer}}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*User Logins to use:*\n{{issue.User Logins to use}}"
+				},
+				{
+					"type": "mrkdwn",
+					"text": "*Is it End-User Facing?:*\n{{issue.End User Facing}}"
+				}
+			]
+		}
+	]
+}
