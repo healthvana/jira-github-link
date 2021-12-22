@@ -1,5 +1,5 @@
 devconfig.*
 node_modules/
 .DS_STORE
-usersMap.json
 .env
+*/fixtures/
