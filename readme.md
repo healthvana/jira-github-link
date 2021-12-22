@@ -1,11 +1,13 @@
 # jira-github-link
 
-## Current functionality (v2.0.2)
+## Current functionality (v2.1.0)
 
 On Pull request creation, review request, and review request removal:
- -  syncs `Reviewers` in Github to the `Code Reviewer(s)` custom field in Jira (this includes clearing the current reviewer in Jira if all reviwers are unassigned in Github)
- -  If number of Reviewers > 1, sends a notification to Slack webhook with an `@` nofication to the reviewer.
- -  
+ - Checks branch name and PR title for Jira issue keys that match linked projects
+ - Grabs issue information based on keys, and posts a comment in the PR with that info.
+ - Syncs `Reviewers` in Github to the `Code Reviewer(s)` custom field in Jira (this includes clearing the current reviewer in Jira if all reviwers are unassigned in Github)
+ - If number of Reviewers > 1 and issue type is _not_ an Epic, sends a notification to Slack webhook with an `@` nofication to the reviewer.
+ - If no issues can be found in the branch name or PR title, adds the label "NO JIRA TICKET" to the PR
 
 ## Inputs
 
