@@ -51,7 +51,7 @@ const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void
     }
     const { title, head: { ref: branch } } = pull_request;
     core.startGroup('Github Context');
-    // core.info(JSON.stringify(context, null, 2));
+    core.info(JSON.stringify(github_1.context, null, 2));
     core.endGroup();
     // Get all existing project keys from Jira
     let projectsInfo;
@@ -69,15 +69,17 @@ const getIssueKeysfromBranch = () => (0, tslib_1.__awaiter)(void 0, void 0, void
     const regexp = new RegExp(projectsRegex, 'gi');
     const branchMatches = branch.match(regexp) || [];
     const titleMatches = title.match(regexp) || [];
+    core.startGroup('Key Matches debug');
     core.debug('branchMatches::');
     core.debug(JSON.stringify(branchMatches));
     core.debug('titleMatches::');
     core.debug(JSON.stringify(titleMatches));
+    core.endGroup();
     // If none, throw; label PR
     if (!(branchMatches === null || branchMatches === void 0 ? void 0 : branchMatches.length) && !(titleMatches === null || titleMatches === void 0 ? void 0 : titleMatches.length)) {
         try {
             // TODO: Add a label to issue that there's no Jira ticket
-            console.error('no ticket');
+            core.error('no ticket');
         }
         catch (e) {
             core.setFailed(`No issue keys found in branch name "${branch} and unable to label PR."`);
@@ -145,7 +147,7 @@ const getIssueInfoFromKeys = (keys) => (0, tslib_1.__awaiter)(void 0, void 0, vo
             });
         }
         catch (e) {
-            console.error(`Issue ${key} could not be found in Jira or could not be fetched:`);
+            core.error(`Issue ${key} could not be found in Jira or could not be fetched:`);
             octokit.rest.issues.createComment({
                 owner,
                 repo,
@@ -237,13 +239,6 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
             body: (0, PRComment_1.default)(issues)
         });
     }
-    core.debug('Adding Jira info in a comment...');
-    octokit.rest.issues.createComment({
-        owner,
-        repo,
-        issue_number,
-        body: (0, PRComment_1.default)(issues)
-    });
     // Get the reviewer's info from the usersmap
     const reviewersInfo = getReviewersInfo();
     core.debug('reviewersInfo::');
@@ -281,8 +276,8 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
         })));
     }
     catch (e) {
-        console.error(`Updating Jira tickets ${keysDisplay} failed:`);
-        console.error(e);
+        core.error(`Updating Jira tickets ${keysDisplay} failed:`);
+        core.error(e);
     }
     core.startGroup('Send Slack Notification');
     let slackResponse;
@@ -299,8 +294,8 @@ const onPRCreateOrReview = () => (0, tslib_1.__awaiter)(void 0, void 0, void 0, 
         core.debug(JSON.stringify(slackResponse, null, 4));
     }
     catch (e) {
-        console.error(`Sending Slack notification for ticket ${keysDisplay} failed:`);
-        console.error(e);
+        core.error(`Sending Slack notification for ticket ${keysDisplay} failed:`);
+        core.error(e);
     }
     // TODO: transition issue
     core.endGroup();

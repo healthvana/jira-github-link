@@ -84,7 +84,7 @@ const getIssueKeysfromBranch = async () => {
     head: { ref: branch }
   } = pull_request;
   core.startGroup('Github Context');
-  // core.info(JSON.stringify(context, null, 2));
+  core.info(JSON.stringify(context, null, 2));
   core.endGroup();
 
   // Get all existing project keys from Jira
@@ -104,16 +104,18 @@ const getIssueKeysfromBranch = async () => {
   const branchMatches = branch.match(regexp) || [];
   const titleMatches = title.match(regexp) || [];
 
+  core.startGroup('Key Matches debug');
   core.debug('branchMatches::');
   core.debug(JSON.stringify(branchMatches));
   core.debug('titleMatches::');
   core.debug(JSON.stringify(titleMatches));
+  core.endGroup();
 
   // If none, throw; label PR
   if (!branchMatches?.length && !titleMatches?.length) {
     try {
       // TODO: Add a label to issue that there's no Jira ticket
-      console.error('no ticket');
+      core.error('no ticket');
     } catch (e) {
       core.setFailed(
         `No issue keys found in branch name "${branch} and unable to label PR."`
@@ -189,7 +191,7 @@ const getIssueInfoFromKeys = async (keys: unknown[] | string[]) => {
           expand: 'names'
         });
       } catch (e) {
-        console.error(
+        core.error(
           `Issue ${key} could not be found in Jira or could not be fetched:`
         );
         octokit.rest.issues.createComment({
@@ -288,7 +290,7 @@ const onPRCreateOrReview = async () => {
     repo,
     issue_number
   });
-  core
+
   core.exportVariable('COMMENTS', JSON.stringify(comments));
   // Only add a new comment if one doesn't already exist
   if (!comments.data.some(c => c.body.includes('PR Creation Comment'))) {
@@ -343,8 +345,8 @@ const onPRCreateOrReview = async () => {
       })
     );
   } catch (e) {
-    console.error(`Updating Jira tickets ${keysDisplay} failed:`);
-    console.error(e);
+    core.error(`Updating Jira tickets ${keysDisplay} failed:`);
+    core.error(e);
   }
 
   core.startGroup('Send Slack Notification');
@@ -361,10 +363,8 @@ const onPRCreateOrReview = async () => {
     core.debug('slackResponse:');
     core.debug(JSON.stringify(slackResponse, null, 4));
   } catch (e) {
-    console.error(
-      `Sending Slack notification for ticket ${keysDisplay} failed:`
-    );
-    console.error(e);
+    core.error(`Sending Slack notification for ticket ${keysDisplay} failed:`);
+    core.error(e);
   }
   // TODO: transition issue
   core.endGroup();
