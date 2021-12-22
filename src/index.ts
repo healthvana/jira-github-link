@@ -288,6 +288,7 @@ const onPRCreateOrReview = async () => {
     repo,
     issue_number
   });
+  core
   core.exportVariable('COMMENTS', JSON.stringify(comments));
   // Only add a new comment if one doesn't already exist
   if (!comments.data.some(c => c.body.includes('PR Creation Comment'))) {
@@ -297,14 +298,7 @@ const onPRCreateOrReview = async () => {
       issue_number,
       body: PRComment(issues)
     });
-  }  
-  core.debug('Adding Jira info in a comment...');
-  octokit.rest.issues.createComment({
-    owner,
-    repo,
-    issue_number,
-    body: PRComment(issues)
-  });
+  }
 
   // Get the reviewer's info from the usersmap
   const reviewersInfo = getReviewersInfo();
