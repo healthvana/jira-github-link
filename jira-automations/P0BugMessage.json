@@ -12,15 +12,15 @@
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": "*<{{issue.url}}|{{issue.key}}>* - Priority: {{issue.priority.name}}"
+				"text": "<!channel>  *<{{issue.url}}|{{issue.key}}>* has been escalated to *Critical*"
 			}
 		},
 		{
 			"type": "context",
 			"elements": [
 				{
-					"type": "plain_text",
-					"text": "<!channel> A critical bug has been reported by: *{{issue.reporter.displayName}}*"
+					"type": "mrkdwn",
+					"text": "*Changed by* {{initiator.displayName}}"
 				}
 			]
 		},
@@ -32,16 +32,7 @@
 			"fields": [
 				{
 					"type": "mrkdwn",
-					"text": "*Is a critical system down?* {{issue.customfield_10845}}"
-				}
-			]
-		},
-				{
-			"type": "section",
-			"fields": [
-				{
-					"type": "mrkdwn",
-					"text": "*Description:*\n{{issue.description}}"
+					"text": "*Bug Priority:* {{issue.priority.name}} - Critical"
 				}
 			]
 		},
@@ -50,23 +41,11 @@
 			"fields": [
 				{
 					"type": "mrkdwn",
-					"text": "*How many reports of the issue have been made by users?*\n{{issue.How many reports of the issue have been made by users?}}"
+					"text": "*Reported by:* {{issue.reporter.displayName}}"
 				},
 				{
 					"type": "mrkdwn",
-					"text": "*Is this issue related to a single organization or clinic?*\n{{issue.customfield_10848}}"
-				},
-				{
-					"type": "mrkdwn",
-					"text": "*Customer:*\n{{issue.Customer}}"
-				},
-				{
-					"type": "mrkdwn",
-					"text": "*User Logins to use:*\n{{issue.User Logins to use}}"
-				},
-				{
-					"type": "mrkdwn",
-					"text": "*Is it End-User Facing?*\n{{issue.End User Facing}}"
+					"text": "*Assignee*\n{{assignee.displayName}}"
 				}
 			]
 		}
