@@ -22,13 +22,13 @@
   "main": "./dest/index.js",
   "name": "jira-github-link",
   "scripts": {
-    "build": "tsc -p ./",
-    "dev": "node --loader ts-node/esm ./src/index.ts",
+    "build": "tsc",
+    "dev": "node -r dotenv/config --loader ts-node/esm ./src/index.ts",
     "dev-exec": "node -r dotenv/config ./dest/index.js",
     "exec": "node ./dest/index.js",
     "get-users": "node ./dest/getUsers.js users",
     "get-users-dev": "node -r dotenv/config ./dest/getUsers.js users",
-    "watch": "tsc -p ./ --watch"
+    "watch": "tsc --watch"
   },
-  "version": "2.0.2"
+  "version": "2.1.0"
 }
