@@ -1,0 +1,15 @@
+{
+    "key": "{{issue.key}}",
+    "timestamp": "{{now}}",
+    "project": "{{issue.project.key}}",
+{{#changelog.status}}
+    "prev_status": {
+        "name": "{{fromString}}",
+        "id": "{{from}}"
+    },
+    "next_status": {
+        "name": "{{toString}}",
+        "id": "{{to}}"
+    }
+}
+{{/changelog.status}}
